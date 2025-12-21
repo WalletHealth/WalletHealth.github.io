@@ -1,234 +1,237 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>WalletHealth Dashboard</title>
+<meta charset="UTF-8" />
+<title>WalletHealth</title>
 
-  <style>
-    body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background: #0b0f19;
-      color: #ffffff;
-    }
+<style>
+body{
+  margin:0;
+  font-family:Arial,sans-serif;
+  background:#0b0f19;
+  color:#fff;
+}
 
-    .container {
-      max-width: 420px;
-      margin: auto;
-      padding: 24px 16px;
-    }
+.container{
+  max-width:420px;
+  margin:auto;
+  padding:24px 16px;
+}
 
-    .title {
-      text-align: center;
-      font-size: 26px;
-      font-weight: bold;
-      margin-bottom: 4px;
-    }
+.title{
+  text-align:center;
+  font-size:26px;
+  font-weight:bold;
+}
 
-    .subtitle {
-      text-align: center;
-      font-size: 13px;
-      color: #9ca3af;
-      margin-bottom: 20px;
-    }
+.subtitle{
+  text-align:center;
+  font-size:13px;
+  color:#9ca3af;
+  margin-bottom:20px;
+}
 
-    .card {
-      background: #121826;
-      border-radius: 18px;
-      padding: 20px;
-      box-shadow: 0 0 40px rgba(0,0,0,.5);
-    }
+.card{
+  background:#121826;
+  border-radius:18px;
+  padding:20px;
+  box-shadow:0 0 40px rgba(0,0,0,.5);
+}
 
-    input {
-      width: 100%;
-      padding: 14px;
-      border-radius: 12px;
-      border: none;
-      background: #0b1220;
-      color: #fff;
-      margin-bottom: 12px;
-    }
+input{
+  width:100%;
+  padding:14px;
+  border-radius:12px;
+  border:none;
+  background:#0b1220;
+  color:white;
+  margin-bottom:12px;
+}
 
-    button {
-      width: 100%;
-      padding: 14px;
-      border-radius: 12px;
-      border: none;
-      background: linear-gradient(135deg,#00ffd5,#00b3ff);
-      font-weight: bold;
-      cursor: pointer;
-    }
+button{
+  width:100%;
+  padding:14px;
+  border-radius:12px;
+  border:none;
+  background:linear-gradient(135deg,#00ffd5,#00b3ff);
+  font-weight:bold;
+  cursor:pointer;
+}
 
-    .note {
-      text-align: center;
-      font-size: 12px;
-      color: #9ca3af;
-      margin-top: 10px;
-    }
+.note{
+  text-align:center;
+  font-size:12px;
+  color:#9ca3af;
+  margin-top:10px;
+}
 
-    .gauge-box {
-      display: none;
-      margin-top: 22px;
-      text-align: center;
-    }
+/* Gauge */
+.gauge-box{
+  display:none;
+  margin-top:22px;
+  text-align:center;
+}
 
-    .gauge {
-      width: 200px;
-      height: 200px;
-      border-radius: 50%;
-      margin: auto;
-      background: conic-gradient(
-        #ef4444 0deg,
-        #facc15 120deg,
-        #22c55e 240deg,
-        #22c55e 360deg
-      );
-      position: relative;
-      transition: transform 1s ease;
-    }
+.gauge{
+  width:200px;
+  height:200px;
+  border-radius:50%;
+  margin:auto;
+  background:conic-gradient(
+    #ef4444 0deg,
+    #facc15 120deg,
+    #22c55e 240deg,
+    #22c55e 360deg
+  );
+  position:relative;
+  transition:transform 1s ease;
+}
 
-    .gauge::after {
-      content: "";
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      width: 140px;
-      height: 140px;
-      background: #0b0f19;
-      border-radius: 50%;
-      transform: translate(-50%, -50%);
-    }
+.gauge::after{
+  content:"";
+  position:absolute;
+  top:50%;
+  left:50%;
+  width:140px;
+  height:140px;
+  background:#0b0f19;
+  border-radius:50%;
+  transform:translate(-50%,-50%);
+}
 
-    .center {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      text-align: center;
-      z-index: 2;
-    }
+/* Center (counter-rotated) */
+.center{
+  position:absolute;
+  top:50%;
+  left:50%;
+  transform:translate(-50%,-50%);
+  text-align:center;
+  z-index:2;
+}
 
-    .score {
-      font-size: 36px;
-      font-weight: bold;
-    }
+.score{
+  font-size:36px;
+  font-weight:bold;
+}
 
-    .label {
-      font-size: 13px;
-      color: #9ca3af;
-    }
+.label{
+  font-size:13px;
+  color:#9ca3af;
+}
 
-    .status {
-      margin-top: 10px;
-      font-size: 15px;
-      font-weight: bold;
-    }
+.status{
+  margin-top:10px;
+  font-size:15px;
+  font-weight:bold;
+}
 
-    .fear { color:#ef4444; }
-    .neutral { color:#facc15; }
-    .greed { color:#22c55e; }
+.fear{color:#ef4444;}
+.neutral{color:#facc15;}
+.greed{color:#22c55e;}
 
-    .info {
-      margin-top: 14px;
-      background: #0f172a;
-      padding: 10px;
-      border-radius: 10px;
-      font-size: 14px;
-      text-align: left;
-    }
+.info{
+  margin-top:14px;
+  background:#0f172a;
+  padding:10px;
+  border-radius:10px;
+  font-size:14px;
+  text-align:left;
+}
 
-    .footer {
-      margin-top: 30px;
-      text-align: center;
-      font-size: 11px;
-      color: #6b7280;
-    }
-  </style>
+.footer{
+  margin-top:30px;
+  text-align:center;
+  font-size:11px;
+  color:#6b7280;
+}
+</style>
 </head>
 
 <body>
-  <div class="container">
-    <div class="title">WalletHealth</div>
-    <div class="subtitle">Crypto Wallet Risk Dashboard</div>
+<div class="container">
 
-    <div class="card">
-      <input id="walletInput" placeholder="Paste wallet address (0x...)" />
-      <button onclick="checkHealth()">Check Wallet Health</button>
+  <div class="title">WalletHealth</div>
+  <div class="subtitle">Crypto Wallet Risk Dashboard</div>
 
-      <div class="note">
-        🔒 Read-only • No wallet connect • No private keys
-      </div>
+  <div class="card">
+    <input id="walletInput" placeholder="Paste wallet address (0x...)" />
+    <button onclick="checkHealth()">Check Wallet Health</button>
 
-      <div id="gaugeBox" class="gauge-box">
-        <div id="gauge" class="gauge">
-          <div class="center">
-            <div id="score" class="score">0</div>
-            <div class="label">Health Index</div>
-          </div>
-        </div>
-
-        <div id="status" class="status">Status</div>
-
-        <div class="info">
-          🔑 Active Approvals: <span id="approvals">-</span><br/>
-          ⚠️ Risk Signals: <span id="risks">-</span><br/>
-          🌐 Network Safety: <span id="network">-</span>
-        </div>
-      </div>
+    <div class="note">
+      🔒 Read-only • No wallet connect • No private keys
     </div>
 
-    <div class="footer">
-      © 2025 WalletHealth • Not financial advice
+    <div id="gaugeBox" class="gauge-box">
+      <div id="gauge" class="gauge">
+        <div id="center" class="center">
+          <div id="score" class="score">0</div>
+          <div class="label">Health Index</div>
+        </div>
+      </div>
+
+      <div id="status" class="status"></div>
+
+      <div class="info">
+        🔑 Active Approvals: <span id="approvals"></span><br/>
+        ⚠️ Risk Signals: <span id="risks"></span><br/>
+        🌐 Network Safety: <span id="network"></span>
+      </div>
     </div>
   </div>
 
-  <script>
-    function checkHealth() {
-      const walletInput = document.getElementById("walletInput");
-      const wallet = walletInput.value.trim();
+  <div class="footer">
+    © 2025 WalletHealth • Not financial advice
+  </div>
 
-      if (wallet.length < 10) {
-        alert("Enter valid wallet address");
-        return;
-      }
+</div>
 
-      const scoreEl = document.getElementById("score");
-      const statusEl = document.getElementById("status");
-      const gauge = document.getElementById("gauge");
-      const approvalsEl = document.getElementById("approvals");
-      const risksEl = document.getElementById("risks");
-      const networkEl = document.getElementById("network");
-      const gaugeBox = document.getElementById("gaugeBox");
+<script>
+function checkHealth(){
+  const wallet=document.getElementById("walletInput").value.trim();
+  if(wallet.length<10){
+    alert("Enter valid wallet address");
+    return;
+  }
 
-      const score = 20 + (wallet.length % 80);
-      scoreEl.innerText = score;
+  const scoreEl=document.getElementById("score");
+  const statusEl=document.getElementById("status");
+  const gauge=document.getElementById("gauge");
+  const center=document.getElementById("center");
 
-      const rotation = (score / 100) * 360;
-      gauge.style.transform = `rotate(${rotation}deg)`;
+  const approvals=document.getElementById("approvals");
+  const risks=document.getElementById("risks");
+  const network=document.getElementById("network");
 
-      let statusText = "";
-      let statusClass = "";
+  const gaugeBox=document.getElementById("gaugeBox");
 
-      if (score < 40) {
-        statusText = "🔴 Fear (High Risk)";
-        statusClass = "fear";
-      } else if (score < 70) {
-        statusText = "🟡 Neutral Risk";
-        statusClass = "neutral";
-      } else {
-        statusText = "🟢 Greed (Healthy Wallet)";
-        statusClass = "greed";
-      }
+  const score=20+(wallet.length%80);
+  scoreEl.innerText=score;
 
-      statusEl.className = "status " + statusClass;
-      statusEl.innerText = statusText;
+  const rotation=(score/100)*360;
+  gauge.style.transform=`rotate(${rotation}deg)`;
+  center.style.transform=`translate(-50%,-50%) rotate(${-rotation}deg)`;
 
-      approvalsEl.innerText = score > 65 ? "1 approval" : "5 approvals";
-      risksEl.innerText = score < 40 ? "Suspicious contract activity" : "No major risks";
-      networkEl.innerText = score > 50 ? "Safe network usage" : "Unusual interactions";
+  let statusClass="",statusText="";
+  if(score<40){
+    statusClass="fear";
+    statusText="🔴 Fear (High Risk)";
+  }else if(score<70){
+    statusClass="neutral";
+    statusText="🟡 Neutral Risk";
+  }else{
+    statusClass="greed";
+    statusText="🟢 Greed (Healthy Wallet)";
+  }
 
-      gaugeBox.style.display = "block";
-    }
-  </script>
+  statusEl.className="status "+statusClass;
+  statusEl.innerText=statusText;
+
+  approvals.innerText=score>65?"1 approval":"5 approvals";
+  risks.innerText=score<40?"Suspicious activity":"No major risks";
+  network.innerText=score>50?"Safe network usage":"Unusual interactions";
+
+  gaugeBox.style.display="block";
+}
+</script>
 </body>
 </html>
