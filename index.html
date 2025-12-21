@@ -156,38 +156,48 @@
     </div>
   </div>
 
-  <script>
-    function checkHealth() {
-      const wallet = document.getElementById("walletInput").value.trim();
+<script>
+  function checkHealth() {
+    const wallet = document.getElementById("walletInput").value.trim();
 
-      if (wallet.length < 10) {
-        alert("Please enter a valid wallet address");
-        return;
-      }
-
-      // Fake logic for now
-      const score = 82;
-      let statusText = "Status: ✅ Safe";
-      let statusClass = "safe";
-
-      if (score < 50) {
-        statusText = "Status: ❌ High Risk";
-        statusClass = "risk";
-      } else if (score < 75) {
-        statusText = "Status: ⚠️ Warning";
-        statusClass = "warning";
-      }
-
-      const resultBox = document.getElementById("result");
-      const scoreEl = document.getElementById("score");
-      const statusEl = document.getElementById("status");
-
-      scoreEl.innerText = "Health Score: " + score;
-      scoreEl.className = "score " + statusClass;
-      statusEl.innerText = statusText;
-
-      resultBox.style.display = "block";
+    if (wallet.length < 10) {
+      alert("Please enter a valid wallet address");
+      return;
     }
-  </script>
+
+    // Simple smart logic (demo)
+    let score = 0;
+
+    // wallet length based logic (demo)
+    score += wallet.length % 30;
+    score += 50;
+
+    if (score > 95) score = 95;
+
+    let statusText = "";
+    let statusClass = "";
+
+    if (score >= 75) {
+      statusText = "Status: ✅ Safe";
+      statusClass = "safe";
+    } else if (score >= 50) {
+      statusText = "Status: ⚠️ Warning";
+      statusClass = "warning";
+    } else {
+      statusText = "Status: ❌ High Risk";
+      statusClass = "risk";
+    }
+
+    const resultBox = document.getElementById("result");
+    const scoreEl = document.getElementById("score");
+    const statusEl = document.getElementById("status");
+
+    scoreEl.innerText = "Health Score: " + score;
+    scoreEl.className = "score " + statusClass;
+    statusEl.innerText = statusText;
+
+    resultBox.style.display = "block";
+  }
+</script>
 </body>
 </html>
