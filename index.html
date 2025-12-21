@@ -15,14 +15,14 @@
     .container {
       max-width: 420px;
       margin: auto;
-      padding: 25px 16px;
+      padding: 24px 16px;
     }
 
     .title {
-      font-size: 28px;
-      font-weight: bold;
-      margin-bottom: 6px;
       text-align: center;
+      font-size: 26px;
+      font-weight: bold;
+      margin-bottom: 4px;
     }
 
     .subtitle {
@@ -36,8 +36,7 @@
       background: #121826;
       border-radius: 18px;
       padding: 20px;
-      margin-bottom: 20px;
-      box-shadow: 0 0 30px rgba(0,0,0,0.4);
+      box-shadow: 0 0 40px rgba(0,0,0,.5);
     }
 
     input {
@@ -45,9 +44,8 @@
       padding: 14px;
       border-radius: 12px;
       border: none;
-      outline: none;
       background: #0b1220;
-      color: white;
+      color: #fff;
       margin-bottom: 12px;
     }
 
@@ -62,46 +60,53 @@
     }
 
     .note {
-      margin-top: 10px;
+      text-align: center;
       font-size: 12px;
       color: #9ca3af;
-      text-align: center;
+      margin-top: 10px;
     }
 
     /* Gauge */
     .gauge-box {
       display: none;
-      margin-top: 20px;
+      margin-top: 22px;
       text-align: center;
     }
 
     .gauge {
-      width: 180px;
-      height: 180px;
+      width: 200px;
+      height: 200px;
       border-radius: 50%;
       margin: auto;
       background: conic-gradient(
-        #22c55e 0deg,
-        #22c55e 120deg,
+        #ef4444 0deg,
         #facc15 120deg,
-        #facc15 200deg,
-        #ef4444 200deg,
-        #ef4444 360deg
+        #22c55e 240deg,
+        #22c55e 360deg
       );
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      position: relative;
+      transition: transform 1s ease;
     }
 
-    .gauge-inner {
+    .gauge::after {
+      content: "";
+      position: absolute;
+      top: 50%;
+      left: 50%;
       width: 140px;
       height: 140px;
       background: #0b0f19;
       border-radius: 50%;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
+      transform: translate(-50%, -50%);
+    }
+
+    .center {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      text-align: center;
+      z-index: 2;
     }
 
     .score {
@@ -116,34 +121,34 @@
 
     .status {
       margin-top: 10px;
-      font-size: 14px;
+      font-size: 15px;
       font-weight: bold;
     }
 
-    .safe { color:#22c55e; }
-    .warning { color:#facc15; }
-    .risk { color:#ef4444; }
+    .fear { color:#ef4444; }
+    .neutral { color:#facc15; }
+    .greed { color:#22c55e; }
 
-    .mini-card {
-      margin-top: 15px;
+    .info {
+      margin-top: 14px;
       background: #0f172a;
-      padding: 12px;
-      border-radius: 12px;
+      padding: 10px;
+      border-radius: 10px;
       font-size: 14px;
+      text-align: left;
     }
 
     .footer {
+      margin-top: 30px;
       text-align: center;
       font-size: 11px;
       color: #6b7280;
-      margin-top: 30px;
     }
   </style>
 </head>
 
 <body>
   <div class="container">
-
     <div class="title">WalletHealth</div>
     <div class="subtitle">Crypto Wallet Risk Dashboard</div>
 
@@ -156,8 +161,8 @@
       </div>
 
       <div id="gaugeBox" class="gauge-box">
-        <div class="gauge">
-          <div class="gauge-inner">
+        <div id="gauge" class="gauge">
+          <div class="center">
             <div id="score" class="score">0</div>
             <div class="label">Health Index</div>
           </div>
@@ -165,13 +170,9 @@
 
         <div id="status" class="status">Status</div>
 
-        <div class="mini-card">
-          🔑 Active Approvals: <span id="approvals">-</span>
-        </div>
-        <div class="mini-card">
-          ⚠️ Risk Signals: <span id="risks">-</span>
-        </div>
-        <div class="mini-card">
+        <div class="info">
+          🔑 Active Approvals: <span id="approvals">-</span><br/>
+          ⚠️ Risk Signals: <span id="risks">-</span><br/>
           🌐 Network Safety: <span id="network">-</span>
         </div>
       </div>
@@ -180,7 +181,6 @@
     <div class="footer">
       © 2025 WalletHealth • Not financial advice
     </div>
-
   </div>
 
   <script>
@@ -191,33 +191,35 @@
         return;
       }
 
-      const score = 30 + (wallet.length % 60);
+      const score = 20 + (wallet.length % 80);
+      scoreEl.innerText = score;
 
-      const scoreEl = document.getElementById("score");
+      const gauge = document.getElementById("gauge");
       const statusEl = document.getElementById("status");
 
-      scoreEl.innerText = score;
+      const rotation = (score / 100) * 360;
+      gauge.style.transform = `rotate(${rotation}deg)`;
 
       let statusClass = "";
       let statusText = "";
 
-      if (score >= 70) {
-        statusClass = "safe";
-        statusText = "✅ Safe Wallet";
-      } else if (score >= 45) {
-        statusClass = "warning";
-        statusText = "⚠️ Moderate Risk";
+      if (score < 40) {
+        statusClass = "fear";
+        statusText = "🔴 Fear (High Risk)";
+      } else if (score < 70) {
+        statusClass = "neutral";
+        statusText = "🟡 Neutral Risk";
       } else {
-        statusClass = "risk";
-        statusText = "❌ High Risk";
+        statusClass = "greed";
+        statusText = "🟢 Greed (Healthy Wallet)";
       }
 
       statusEl.className = "status " + statusClass;
       statusEl.innerText = statusText;
 
-      approvals.innerText = score > 60 ? "1 approval" : "6 approvals";
-      risks.innerText = score < 50 ? "Suspicious activity detected" : "No major risks";
-      network.innerText = score > 55 ? "Safe network usage" : "Unusual contract calls";
+      approvals.innerText = score > 65 ? "1 approval" : "5 approvals";
+      risks.innerText = score < 40 ? "Suspicious contract activity" : "No major risks";
+      network.innerText = score > 50 ? "Safe network usage" : "Unusual interactions";
 
       document.getElementById("gaugeBox").style.display = "block";
     }
