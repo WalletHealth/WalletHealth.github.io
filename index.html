@@ -1,264 +1,153 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>WalletHealth – Crypto Wallet Health Dashboard</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta charset="UTF-8">
+<title>WalletHealth</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <style>
-    * { box-sizing: border-box; font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif; }
-    body {
-      margin: 0;
-      min-height: 100vh;
-      background: radial-gradient(circle at top, #0f172a, #020617);
-      color: #e5e7eb;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .card {
-      width: 360px;
-      background: linear-gradient(180deg, #0b1220, #020617);
-      border-radius: 18px;
-      padding: 22px;
-      box-shadow: 0 30px 80px rgba(0,0,0,.6);
-    }
-
-    h1 {
-      text-align: center;
-      margin: 0;
-      font-size: 22px;
-    }
-
-    .subtitle {
-      text-align: center;
-      font-size: 13px;
-      color: #9ca3af;
-      margin-bottom: 18px;
-    }
-
-    input {
-      width: 100%;
-      padding: 12px;
-      border-radius: 10px;
-      border: none;
-      outline: none;
-      background: #020617;
-      color: #e5e7eb;
-      font-size: 14px;
-      margin-bottom: 12px;
-    }
-
-    button {
-      width: 100%;
-      padding: 12px;
-      border-radius: 10px;
-      border: none;
-      background: linear-gradient(90deg, #22d3ee, #3b82f6);
-      color: #020617;
-      font-weight: 700;
-      font-size: 15px;
-      cursor: pointer;
-    }
-
-    .note {
-      text-align: center;
-      font-size: 12px;
-      color: #9ca3af;
-      margin: 10px 0 18px;
-    }
-
-    .hidden { display: none; }
-
-    .ring {
-      width: 170px;
-      height: 170px;
-      border-radius: 50%;
-      margin: 0 auto 10px;
-      background: conic-gradient(#22c55e 0deg, #facc15 180deg, #ef4444 300deg, #22c55e 360deg);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .ring-inner {
-      width: 120px;
-      height: 120px;
-      background: #020617;
-      border-radius: 50%;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .score {
-      font-size: 34px;
-      font-weight: 800;
-    }
-
-    .label {
-      font-size: 12px;
-      color: #9ca3af;
-    }
-
-    .status {
-      text-align: center;
-      margin: 12px 0;
-      font-size: 20px;
-      font-weight: 700;
-    }
-
-    .desc {
-      text-align: center;
-      font-size: 14px;
-      color: #d1d5db;
-      margin-bottom: 16px;
-    }
-
-    .facts {
-      background: rgba(255,255,255,.04);
-      border-radius: 12px;
-      padding: 14px;
-      font-size: 14px;
-      line-height: 1.6;
-    }
-
-    .facts span {
-      color: #9ca3af;
-      font-size: 12px;
-      display: block;
-      margin-top: 8px;
-    }
-
-    footer {
-      text-align: center;
-      font-size: 11px;
-      color: #6b7280;
-      margin-top: 14px;
-    }
-  </style>
+<style>
+*{box-sizing:border-box;font-family:system-ui,-apple-system,BlinkMacSystemFont}
+body{
+  margin:0;min-height:100vh;
+  background:radial-gradient(circle at top,#0f172a,#020617);
+  color:#e5e7eb;display:flex;align-items:center;justify-content:center
+}
+.card{
+  width:360px;padding:22px;border-radius:18px;
+  background:linear-gradient(180deg,#0b1220,#020617);
+  box-shadow:0 30px 80px rgba(0,0,0,.6)
+}
+h1{text-align:center;margin:0;font-size:22px}
+.sub{text-align:center;font-size:13px;color:#9ca3af;margin-bottom:18px}
+input{
+  width:100%;padding:12px;border-radius:10px;
+  border:none;outline:none;background:#020617;color:#e5e7eb;margin-bottom:12px
+}
+button{
+  width:100%;padding:12px;border-radius:10px;border:none;
+  background:linear-gradient(90deg,#22d3ee,#3b82f6);
+  font-weight:700;cursor:pointer
+}
+.note{text-align:center;font-size:12px;color:#9ca3af;margin:10px 0}
+.hidden{display:none}
+.ring{
+  width:170px;height:170px;border-radius:50%;
+  margin:10px auto;background:conic-gradient(#22c55e,#facc15,#ef4444,#22c55e);
+  display:flex;align-items:center;justify-content:center
+}
+.inner{
+  width:120px;height:120px;border-radius:50%;
+  background:#020617;display:flex;flex-direction:column;
+  align-items:center;justify-content:center
+}
+.score{font-size:34px;font-weight:800}
+.label{font-size:12px;color:#9ca3af}
+.status{text-align:center;font-size:20px;font-weight:700;margin-top:10px}
+.desc{text-align:center;font-size:14px;color:#d1d5db;margin:10px 0}
+.facts{
+  background:rgba(255,255,255,.05);
+  border-radius:12px;padding:14px;font-size:14px
+}
+footer{text-align:center;font-size:11px;color:#6b7280;margin-top:14px}
+</style>
 </head>
+
 <body>
-
 <div class="card">
-  <h1>WalletHealth</h1>
-  <div class="subtitle">Crypto Wallet Health Dashboard</div>
+<h1>WalletHealth</h1>
+<div class="sub">Crypto Wallet Health Dashboard</div>
 
-  <input id="walletInput" placeholder="Paste wallet address" />
-  <button onclick="checkWallet()">Check Wallet Health</button>
-  <div class="note">🔒 Read-only • No wallet connect • No private keys</div>
+<input id="wallet" placeholder="Paste wallet address">
+<button onclick="checkWallet()">Check Wallet Health</button>
+<div class="note">🔒 Read-only • No wallet connect • No private keys</div>
 
-  <div id="result" class="hidden">
-    <div class="ring">
-      <div class="ring-inner">
-        <div id="score" class="score">--</div>
-        <div class="label">Health Index</div>
-      </div>
-    </div>
-
-    <div id="status" class="status"></div>
-    <div id="desc" class="desc"></div>
-
-    <div class="facts">
-      <div>🌐 Network: <b id="network">—</b></div>
-      <div>💰 Balance: <b id="balance">—</b></div>
-      <span>Score is calculated using real on-chain balance and activity signals.</span>
+<div id="result" class="hidden">
+  <div class="ring">
+    <div class="inner">
+      <div id="score" class="score">--</div>
+      <div class="label">Health Index</div>
     </div>
   </div>
+  <div id="status" class="status"></div>
+  <div id="desc" class="desc"></div>
+  <div class="facts">
+    🌐 Network: <b id="network">—</b><br>
+    💰 Balance: <b id="balance">—</b>
+  </div>
+</div>
 
-  <footer>© 2025 WalletHealth • Not financial advice</footer>
+<footer>© 2025 WalletHealth • Not financial advice</footer>
 </div>
 
 <script>
-async function checkWallet() {
-  const addr = document.getElementById("walletInput").value.trim();
-  if (!addr) return alert("Please enter a wallet address");
-
+async function checkWallet(){
+  const addr=document.getElementById("wallet").value.trim();
+  if(!addr) return alert("Enter wallet address");
   document.getElementById("result").classList.remove("hidden");
 
-  // Detect Ethereum
-  if (/^0x[a-fA-F0-9]{40}$/.test(addr)) {
-    await handleEthereum(addr);
-    return;
-  }
-
-  // Detect Bitcoin
-  if (/^(bc1|[13])[a-zA-HJ-NP-Z0-9]{25,39}$/.test(addr)) {
-    await handleBitcoin(addr);
-    return;
-  }
+  if(/^0x[a-fA-F0-9]{40}$/.test(addr)) return eth(addr);
+  if(/^(bc1|[13])[a-zA-HJ-NP-Z0-9]{25,39}$/.test(addr)) return btc(addr);
 
   alert("Unsupported wallet format");
 }
 
-async function handleEthereum(address) {
-  document.getElementById("network").innerText = "Ethereum";
-
-  try {
-    const rpc = "https://cloudflare-eth.com";
-    const res = await fetch(rpc, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        jsonrpc: "2.0",
-        id: 1,
-        method: "eth_getBalance",
-        params: [address, "latest"]
-      })
-    });
-
-    const data = await res.json();
-    const wei = parseInt(data.result, 16);
-    const eth = wei / 1e18;
-
-    renderResult(eth, "ETH");
-
-  } catch (e) {
-    document.getElementById("balance").innerText = "Unable to fetch";
+async function eth(address){
+  document.getElementById("network").innerText="Ethereum";
+  try{
+    const res=await fetch(
+      "https://api.allorigins.win/raw?url=https://eth-mainnet.g.alchemy.com/v2/demo",
+      {
+        method:"POST",
+        headers:{"Content-Type":"application/json"},
+        body:JSON.stringify({
+          jsonrpc:"2.0",id:1,method:"eth_getBalance",
+          params:[address,"latest"]
+        })
+      }
+    );
+    const data=await res.json();
+    const wei=parseInt(data.result,16);
+    if(isNaN(wei)) throw "NaN";
+    render(wei/1e18,"ETH");
+  }catch{
+    fail();
   }
 }
 
-async function handleBitcoin(address) {
-  document.getElementById("network").innerText = "Bitcoin";
-
-  try {
-    const res = await fetch(`https://blockstream.info/api/address/${address}`);
-    const data = await res.json();
-    const sat =
-      data.chain_stats.funded_txo_sum -
-      data.chain_stats.spent_txo_sum;
-
-    const btc = sat / 1e8;
-    renderResult(btc, "BTC");
-
-  } catch (e) {
-    document.getElementById("balance").innerText = "Unable to fetch";
+async function btc(address){
+  document.getElementById("network").innerText="Bitcoin";
+  try{
+    const res=await fetch(
+      "https://api.allorigins.win/raw?url=https://blockchain.info/rawaddr/"+address
+    );
+    const d=await res.json();
+    render(d.final_balance/1e8,"BTC");
+  }catch{
+    fail();
   }
 }
 
-function renderResult(amount, symbol) {
-  document.getElementById("balance").innerText =
-    amount.toFixed(4) + " " + symbol;
+function render(amount,symbol){
+  document.getElementById("balance").innerText=
+    amount.toFixed(4)+" "+symbol;
 
-  let score = 40;
-  let status = "Low Activity Wallet";
-  let desc =
-    "This wallet has no or very low balance, which may indicate low on-chain activity.";
+  let score=amount>0?70:40;
+  document.getElementById("score").innerText=score;
+  document.getElementById("status").innerText=
+    amount>0?"Active Wallet":"Low Activity Wallet";
+  document.getElementById("desc").innerText=
+    amount>0
+    ?"This wallet holds funds, indicating normal on-chain activity."
+    :"This wallet has no balance, indicating low on-chain activity.";
+}
 
-  if (amount > 0) {
-    score = 70;
-    status = "Active Wallet";
-    desc =
-      "This wallet holds a balance, indicating normal on-chain activity.";
-  }
-
-  document.getElementById("score").innerText = score;
-  document.getElementById("status").innerText = status;
-  document.getElementById("desc").innerText = desc;
+function fail(){
+  document.getElementById("balance").innerText="Temporarily unavailable";
+  document.getElementById("score").innerText="--";
+  document.getElementById("status").innerText="Data unavailable";
+  document.getElementById("desc").innerText=
+    "Unable to fetch on-chain data at the moment. Please try again later.";
 }
 </script>
-
 </body>
 </html>
