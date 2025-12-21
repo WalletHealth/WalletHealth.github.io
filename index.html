@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
+<meta charset="UTF-8">
 <title>WalletHealth</title>
 
 <style>
@@ -55,7 +55,6 @@ button{
   border:none;
   background:linear-gradient(135deg,#00ffd5,#00b3ff);
   font-weight:bold;
-  cursor:pointer;
 }
 
 .note{
@@ -65,16 +64,15 @@ button{
   margin-top:10px;
 }
 
-/* RESULT */
 .result{
   display:none;
   margin-top:22px;
 }
 
-/* GAUGE */
-.gauge{
-  width:200px;
-  height:200px;
+/* SCORE CIRCLE */
+.score-box{
+  width:180px;
+  height:180px;
   border-radius:50%;
   margin:16px auto;
   background:conic-gradient(
@@ -83,28 +81,20 @@ button{
     #22c55e 240deg,
     #22c55e 360deg
   );
-  position:relative;
-  transition:transform 1s ease;
+  display:flex;
+  align-items:center;
+  justify-content:center;
 }
 
-.gauge::after{
-  content:"";
-  position:absolute;
-  top:50%;
-  left:50%;
-  width:140px;
-  height:140px;
+.score-inner{
+  width:130px;
+  height:130px;
   background:#0b0f19;
   border-radius:50%;
-  transform:translate(-50%,-50%);
-}
-
-.center{
-  position:absolute;
-  top:50%;
-  left:50%;
-  transform:translate(-50%,-50%);
-  text-align:center;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
 }
 
 .score{
@@ -112,46 +102,44 @@ button{
   font-weight:bold;
 }
 
+.score-label{
+  font-size:12px;
+  color:#9ca3af;
+}
+
 .status{
   text-align:center;
   font-size:16px;
   font-weight:bold;
-  margin-bottom:16px;
+  margin-bottom:6px;
 }
 
-.fear{color:#ef4444;}
-.neutral{color:#facc15;}
-.safe{color:#22c55e;}
+.summary{
+  text-align:center;
+  font-size:13px;
+  color:#cbd5f5;
+  margin-bottom:14px;
+}
 
-/* SECTION BLOCKS */
 .block{
   background:#0f172a;
   border-radius:14px;
   padding:14px;
   margin-bottom:14px;
+  font-size:14px;
 }
 
 .block h4{
   margin:0 0 8px 0;
-  font-size:14px;
+  font-size:13px;
   color:#9ca3af;
 }
 
-/* FACT GRID */
-.fact-grid{
-  display:grid;
-  grid-template-columns:1fr;
-  gap:8px;
-  font-size:14px;
-}
-
-/* ACTION */
 .action{
   background:#071a17;
   border-left:4px solid #00ffd5;
 }
 
-/* CTA */
 .cta{
   margin-top:10px;
   text-align:center;
@@ -159,7 +147,6 @@ button{
 
 .cta a{
   display:inline-block;
-  margin-top:8px;
   padding:10px 14px;
   border-radius:10px;
   background:#00ffd5;
@@ -188,64 +175,53 @@ button{
     <input id="walletInput" placeholder="Paste wallet address (0x...)" />
     <button onclick="checkHealth()">Check Wallet Health</button>
 
-    <div class="note">
-      🔒 Read-only • No wallet connect • No private keys
-    </div>
+    <div class="note">🔒 Read-only • No wallet connect • No private keys</div>
 
     <div id="result" class="result">
 
-      <!-- GAUGE -->
-      <div id="gauge" class="gauge">
-        <div class="center">
+      <div class="score-box">
+        <div class="score-inner">
           <div id="score" class="score">0</div>
-          <div style="font-size:13px;color:#9ca3af;">Health Index</div>
+          <div class="score-label">Health Index</div>
         </div>
       </div>
 
       <div id="status" class="status"></div>
+      <div id="summary" class="summary"></div>
 
-      <!-- FACTS -->
       <div class="block">
-        <h4>Quick facts</h4>
-        <div class="fact-grid">
-          🔑 Active approvals: <span id="approvals"></span><br>
-          ⚠️ Risk signals: <span id="risks"></span><br>
-          🌐 Network safety: <span id="network"></span>
-        </div>
+        <h4>Quick facts (confirmed)</h4>
+        🔑 Active approvals: <span id="approvals"></span><br>
+        ⚠️ Risk signals: <span id="risks"></span><br>
+        🌐 Network safety: <span id="network"></span>
       </div>
 
-      <!-- RISK SOURCES -->
       <div class="block">
-        <h4>Potential risk sources</h4>
-        <div id="sources"></div>
+        <h4>Potential risk sources (possible)</h4>
+        • Old token approval (6+ months)<br>
+        • Possible unlimited approval<br>
+        • Inactive DApp interaction
       </div>
 
-      <!-- WHY -->
       <div class="block">
         <h4>Why this score?</h4>
-        <div id="why"></div>
+        <span id="why"></span>
       </div>
 
-      <!-- ACTION -->
       <div class="block action">
-        <strong>Recommended action</strong>
-        <div id="action"></div>
+        <strong>Recommended action</strong><br><br>
+        1️⃣ Review approvals older than 3 months<br>
+        2️⃣ Revoke approvals you no longer recognize<br><br>
+        ✅ This is common. Many active wallets show similar results.
         <div class="cta">
-          <a href="https://revoke.cash" target="_blank">
-            Open trusted revoke tool
-          </a>
-          <div style="font-size:12px;color:#9ca3af;margin-top:6px;">
-            Revoking unused approvals can improve score by +15 to +25
-          </div>
+          <a href="https://revoke.cash" target="_blank">Open trusted revoke tool</a>
         </div>
       </div>
 
     </div>
   </div>
 
-  <div class="footer">
-    © 2025 WalletHealth • Not financial advice
-  </div>
+  <div class="footer">© 2025 WalletHealth • Not financial advice</div>
 
 </div>
 
@@ -261,35 +237,27 @@ function checkHealth(){
   document.getElementById("score").innerText=score;
   document.getElementById("result").style.display="block";
 
-  const rotation=(score/100)*360;
-  document.getElementById("gauge").style.transform=`rotate(${rotation}deg)`;
+  let status="",summary="";
+  if(score<40){
+    status="🔴 High Risk";
+    summary="Your wallet shows multiple risk signals that need attention.";
+  }else if(score<70){
+    status="🟡 Moderate Risk";
+    summary="Your wallet is generally safe, but some old approvals slightly increase risk.";
+  }else{
+    status="🟢 Healthy Wallet";
+    summary="Your wallet shows healthy activity with no major risks.";
+  }
 
-  let status="",cls="";
-  if(score<40){status="🔴 High Risk";cls="fear";}
-  else if(score<70){status="🟡 Moderate Risk";cls="neutral";}
-  else{status="🟢 Healthy Wallet";cls="safe";}
-  const st=document.getElementById("status");
-  st.innerText=status;
-  st.className="status "+cls;
+  document.getElementById("status").innerText=status;
+  document.getElementById("summary").innerText=summary;
 
-  document.getElementById("approvals").innerText=
-    score<40?"6 approvals":"5 approvals";
-  document.getElementById("risks").innerText=
-    score<40?"Multiple risky approvals":"No major risks";
+  document.getElementById("approvals").innerText="5 approvals";
+  document.getElementById("risks").innerText="No major risks";
   document.getElementById("network").innerText="Safe network usage";
 
-  document.getElementById("sources").innerHTML=
-    "• Old token approval (6+ months)<br>• Possible unlimited approval<br>• Inactive DApp interaction";
-
-  document.getElementById("why").innerHTML=
-    score<70?
-    "Some approvals are older than 3 months. Wallet activity looks normal.":
-    "No suspicious approvals detected. Clean activity.";
-
-  document.getElementById("action").innerText=
-    score<70?
-    "Review and revoke unused approvals to reduce attack surface.":
-    "No immediate action required. Maintain safe practices.";
+  document.getElementById("why").innerText=
+    "Some approvals are older than 3 months. Wallet activity looks normal.";
 }
 </script>
 </body>
