@@ -29,7 +29,7 @@
       font-size: 34px;
       font-weight: bold;
       letter-spacing: 1px;
-      margin-bottom: 8px;
+      margin-bottom: 6px;
       color: #00ffd5;
       text-shadow: 0 0 18px rgba(0, 255, 213, 0.6);
     }
@@ -84,8 +84,8 @@
 
     .result {
       display: none;
-      margin-top: 25px;
-      padding: 20px;
+      margin-top: 22px;
+      padding: 18px;
       border-radius: 14px;
       background: rgba(0, 0, 0, 0.35);
       border: 1px solid rgba(0, 255, 213, 0.3);
@@ -94,11 +94,12 @@
     .score {
       font-size: 26px;
       font-weight: bold;
-      margin-bottom: 8px;
+      margin-bottom: 6px;
     }
 
     .status {
       font-size: 14px;
+      margin-bottom: 14px;
     }
 
     .safe {
@@ -111,6 +112,17 @@
 
     .risk {
       color: #ef4444;
+    }
+
+    .alerts {
+      display: none;
+      text-align: left;
+      font-size: 14px;
+      margin-top: 10px;
+    }
+
+    .alert-item {
+      margin-bottom: 10px;
     }
 
     .footer {
@@ -142,13 +154,28 @@
       </div>
 
       <div id="result" class="result">
-  <div id="score" class="score safe">
-    Health Score: 82
-  </div>
-  <div id="status" class="status">
-    Status: ✅ Safe
-  </div>
-</div>
+        <div id="score" class="score safe">
+          Health Score: 0
+        </div>
+        <div id="status" class="status">
+          Status
+        </div>
+
+        <div id="alerts" class="alerts">
+          <div class="alert-item">
+            🔑 <strong>Active Approvals:</strong>
+            <span id="approvals">-</span>
+          </div>
+          <div class="alert-item">
+            ⚠️ <strong>Risk Alerts:</strong>
+            <span id="risks">-</span>
+          </div>
+          <div class="alert-item">
+            ⛽ <strong>Gas Status:</strong>
+            <span id="gas">-</span>
+          </div>
+        </div>
+      </div>
     </div>
 
     <div class="footer">
@@ -156,58 +183,58 @@
     </div>
   </div>
 
-<script>
-  function checkHealth() {
-    const wallet = document.getElementById("walletInput").value.trim();
+  <script>
+    function checkHealth() {
+      const wallet = document.getElementById("walletInput").value.trim();
 
-    if (wallet.length < 10) {
-      alert("Please enter a valid wallet address");
-      return;
+      if (wallet.length < 10) {
+        alert("Please enter a valid wallet address");
+        return;
+      }
+
+      // -------- Fake Smart Logic (Demo) --------
+      let score = 50 + (wallet.length % 30);
+      if (score > 95) score = 95;
+
+      let statusText = "";
+      let statusClass = "";
+
+      if (score >= 75) {
+        statusText = "Status: ✅ Safe";
+        statusClass = "safe";
+      } else if (score >= 50) {
+        statusText = "Status: ⚠️ Warning";
+        statusClass = "warning";
+      } else {
+        statusText = "Status: ❌ High Risk";
+        statusClass = "risk";
+      }
+
+      // -------- Update UI --------
+      const resultBox = document.getElementById("result");
+      const scoreEl = document.getElementById("score");
+      const statusEl = document.getElementById("status");
+
+      scoreEl.innerText = "Health Score: " + score;
+      scoreEl.className = "score " + statusClass;
+      statusEl.innerText = statusText;
+
+      resultBox.style.display = "block";
+
+      // -------- Fake Alerts (Demo) --------
+      document.getElementById("approvals").innerText =
+        score > 70 ? "1 active approval" : "5 active approvals";
+
+      document.getElementById("risks").innerText =
+        score < 50
+          ? "Suspicious contract interaction detected"
+          : "No critical issues";
+
+      document.getElementById("gas").innerText =
+        score > 60 ? "Low / Normal" : "High";
+
+      document.getElementById("alerts").style.display = "block";
     }
-
-    // Simple smart logic (demo)
-    let score = 0;
-
-    // wallet length based logic (demo)
-    score += wallet.length % 30;
-    score += 50;
-
-    if (score > 95) score = 95;
-
-    let statusText = "";
-    let statusClass = "";
-
-    if (score >= 75) {
-      statusText = "Status: ✅ Safe";
-      statusClass = "safe";
-    } else if (score >= 50) {
-      statusText = "Status: ⚠️ Warning";
-      statusClass = "warning";
-    } else {
-      statusText = "Status: ❌ High Risk";
-      statusClass = "risk";
-    }
-
-    const resultBox = document.getElementById("result");
-    const scoreEl = document.getElementById("score");
-    const statusEl = document.getElementById("status");
-
-    scoreEl.innerText = "Health Score: " + score;
-    scoreEl.className = "score " + statusClass;
-    statusEl.innerText = statusText;
-
-    // Fake alert logic (demo)
-document.getElementById("approvals").innerText =
-  score > 70 ? "1" : "5";
-
-document.getElementById("risks").innerText =
-  score < 50 ? "Suspicious contract interaction detected" : "No critical issues";
-
-document.getElementById("gas").innerText =
-  score > 60 ? "Low / Normal" : "High";
-
-document.getElementById("alerts").style.display = "block";
-  }
-</script>
+  </script>
 </body>
 </html>
