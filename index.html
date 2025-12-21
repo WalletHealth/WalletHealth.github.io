@@ -5,22 +5,19 @@
   <title>WalletHealth</title>
 
   <style>
-    * {
-      box-sizing: border-box;
-    }
+    * { box-sizing: border-box; }
 
     body {
       margin: 0;
-      padding: 0;
       font-family: 'Segoe UI', Arial, sans-serif;
-      background: radial-gradient(circle at top, #0f2027, #000000);
-      color: #ffffff;
+      background: radial-gradient(circle at top, #0f2027, #000);
+      color: #fff;
       min-height: 100vh;
     }
 
     .container {
       max-width: 420px;
-      margin: 0 auto;
+      margin: auto;
       padding: 40px 20px;
       text-align: center;
     }
@@ -28,24 +25,22 @@
     .logo {
       font-size: 34px;
       font-weight: bold;
-      letter-spacing: 1px;
-      margin-bottom: 6px;
       color: #00ffd5;
-      text-shadow: 0 0 18px rgba(0, 255, 213, 0.6);
+      text-shadow: 0 0 18px rgba(0,255,213,.6);
     }
 
     .tagline {
       font-size: 14px;
       color: #9ca3af;
-      margin-bottom: 35px;
+      margin-bottom: 30px;
     }
 
     .card {
-      background: rgba(255, 255, 255, 0.06);
+      background: rgba(255,255,255,.06);
       border-radius: 18px;
       padding: 25px;
       backdrop-filter: blur(14px);
-      box-shadow: 0 0 45px rgba(0, 255, 213, 0.18);
+      box-shadow: 0 0 45px rgba(0,255,213,.18);
     }
 
     input {
@@ -53,11 +48,9 @@
       padding: 15px;
       border-radius: 14px;
       border: none;
-      outline: none;
       background: #0b1220;
-      color: white;
-      font-size: 14px;
-      margin-bottom: 16px;
+      color: #fff;
+      margin-bottom: 15px;
     }
 
     button {
@@ -65,21 +58,22 @@
       padding: 15px;
       border-radius: 14px;
       border: none;
-      background: linear-gradient(135deg, #00ffd5, #00b3ff);
-      color: #000;
-      font-size: 15px;
+      background: linear-gradient(135deg,#00ffd5,#00b3ff);
       font-weight: bold;
       cursor: pointer;
-    }
-
-    button:hover {
-      opacity: 0.9;
     }
 
     .note {
       font-size: 12px;
       color: #9ca3af;
+      margin-top: 12px;
+    }
+
+    .loading {
+      display: none;
       margin-top: 15px;
+      font-size: 13px;
+      color: #9ca3af;
     }
 
     .result {
@@ -87,8 +81,14 @@
       margin-top: 22px;
       padding: 18px;
       border-radius: 14px;
-      background: rgba(0, 0, 0, 0.35);
-      border: 1px solid rgba(0, 255, 213, 0.3);
+      background: rgba(0,0,0,.35);
+      border: 1px solid rgba(0,255,213,.3);
+      animation: fadeIn .6s ease;
+    }
+
+    @keyframes fadeIn {
+      from {opacity:0; transform:translateY(10px);}
+      to {opacity:1; transform:translateY(0);}
     }
 
     .score {
@@ -97,36 +97,26 @@
       margin-bottom: 6px;
     }
 
-    .status {
-      font-size: 14px;
-      margin-bottom: 14px;
-    }
+    .safe { color:#22c55e; }
+    .warning { color:#facc15; }
+    .risk { color:#ef4444; }
 
-    .safe {
-      color: #22c55e;
-    }
-
-    .warning {
-      color: #facc15;
-    }
-
-    .risk {
-      color: #ef4444;
-    }
-
-    .alerts {
-      display: none;
+    .breakdown {
       text-align: left;
+      margin-top: 15px;
       font-size: 14px;
-      margin-top: 10px;
     }
 
-    .alert-item {
+    .item {
+      background: rgba(255,255,255,.05);
+      padding: 10px 12px;
+      border-radius: 10px;
       margin-bottom: 10px;
+      border-left: 3px solid #00ffd5;
     }
 
     .footer {
-      margin-top: 45px;
+      margin-top: 40px;
       font-size: 11px;
       color: #6b7280;
     }
@@ -136,43 +126,36 @@
 <body>
   <div class="container">
     <div class="logo">WalletHealth</div>
-    <div class="tagline">
-      Universal Crypto Wallet Health Dashboard
-    </div>
+    <div class="tagline">Universal Crypto Wallet Health Dashboard</div>
 
     <div class="card">
-      <input
-        id="walletInput"
-        type="text"
-        placeholder="Paste your wallet address (0x...)"
-      />
-
+      <input id="walletInput" placeholder="Paste wallet address (0x...)" />
       <button onclick="checkHealth()">Check Wallet Health</button>
 
       <div class="note">
         🔒 Read-only • No wallet connect • No private keys
       </div>
 
-      <div id="result" class="result">
-        <div id="score" class="score safe">
-          Health Score: 0
-        </div>
-        <div id="status" class="status">
-          Status
-        </div>
+      <div id="loading" class="loading">
+        🔍 Scanning wallet health...
+      </div>
 
-        <div id="alerts" class="alerts">
-          <div class="alert-item">
-            🔑 <strong>Active Approvals:</strong>
-            <span id="approvals">-</span>
+      <div id="result" class="result">
+        <div id="score" class="score">Health Score</div>
+        <div id="status">Status</div>
+
+        <div class="breakdown">
+          <div class="item">
+            📊 <strong>Activity Score:</strong>
+            <span id="activity">-</span>
           </div>
-          <div class="alert-item">
-            ⚠️ <strong>Risk Alerts:</strong>
-            <span id="risks">-</span>
+          <div class="item">
+            🔑 <strong>Approval Risk:</strong>
+            <span id="approval">-</span>
           </div>
-          <div class="alert-item">
-            ⛽ <strong>Gas Status:</strong>
-            <span id="gas">-</span>
+          <div class="item">
+            🌐 <strong>Network Safety:</strong>
+            <span id="network">-</span>
           </div>
         </div>
       </div>
@@ -185,55 +168,46 @@
 
   <script>
     function checkHealth() {
-      const wallet = document.getElementById("walletInput").value.trim();
-
+      const wallet = walletInput.value.trim();
       if (wallet.length < 10) {
-        alert("Please enter a valid wallet address");
+        alert("Enter valid wallet address");
         return;
       }
 
-      // -------- Fake Smart Logic (Demo) --------
-      let score = 50 + (wallet.length % 30);
-      if (score > 95) score = 95;
+      loading.style.display = "block";
+      result.style.display = "none";
 
-      let statusText = "";
-      let statusClass = "";
+      setTimeout(() => {
+        loading.style.display = "none";
 
-      if (score >= 75) {
-        statusText = "Status: ✅ Safe";
-        statusClass = "safe";
-      } else if (score >= 50) {
-        statusText = "Status: ⚠️ Warning";
-        statusClass = "warning";
-      } else {
-        statusText = "Status: ❌ High Risk";
-        statusClass = "risk";
-      }
+        let score = 50 + (wallet.length % 30);
+        if (score > 95) score = 95;
 
-      // -------- Update UI --------
-      const resultBox = document.getElementById("result");
-      const scoreEl = document.getElementById("score");
-      const statusEl = document.getElementById("status");
+        let statusClass = score >= 75 ? "safe" :
+                          score >= 50 ? "warning" : "risk";
 
-      scoreEl.innerText = "Health Score: " + score;
-      scoreEl.className = "score " + statusClass;
-      statusEl.innerText = statusText;
+        scoreEl = document.getElementById("score");
+        statusEl = document.getElementById("status");
 
-      resultBox.style.display = "block";
+        scoreEl.innerText = "Health Score: " + score;
+        scoreEl.className = "score " + statusClass;
 
-      // -------- Fake Alerts (Demo) --------
-      document.getElementById("approvals").innerText =
-        score > 70 ? "1 active approval" : "5 active approvals";
+        statusEl.innerText =
+          score >= 75 ? "Status: ✅ Safe" :
+          score >= 50 ? "Status: ⚠️ Warning" :
+                        "Status: ❌ High Risk";
 
-      document.getElementById("risks").innerText =
-        score < 50
-          ? "Suspicious contract interaction detected"
-          : "No critical issues";
+        document.getElementById("activity").innerText =
+          score > 70 ? "High activity" : "Low activity";
 
-      document.getElementById("gas").innerText =
-        score > 60 ? "Low / Normal" : "High";
+        document.getElementById("approval").innerText =
+          score > 60 ? "Low risk approvals" : "Multiple risky approvals";
 
-      document.getElementById("alerts").style.display = "block";
+        document.getElementById("network").innerText =
+          score > 65 ? "Secure network usage" : "Potential unsafe interactions";
+
+        result.style.display = "block";
+      }, 1500);
     }
   </script>
 </body>
