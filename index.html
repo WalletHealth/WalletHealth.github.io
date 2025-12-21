@@ -126,14 +126,29 @@ button{
 
 .fear{color:#ef4444;}
 .neutral{color:#facc15;}
-.greend{color:#22c55e;}
+.green{color:#22c55e;}
 
+/* FACT CARDS */
+.facts{
+  display:grid;
+  grid-template-columns:1fr;
+  gap:10px;
+  margin-top:16px;
+}
+
+.fact{
+  background:#0f172a;
+  padding:10px;
+  border-radius:10px;
+  font-size:14px;
+}
+
+/* WHY + ACTION */
 .section{
   margin-top:16px;
   background:#0f172a;
   padding:12px;
   border-radius:12px;
-  text-align:left;
   font-size:14px;
 }
 
@@ -185,13 +200,20 @@ button{
 
       <div id="status" class="status"></div>
 
-      <!-- WHY SECTION -->
+      <!-- FACTS -->
+      <div class="facts">
+        <div class="fact">🔑 Active Approvals: <span id="approvals"></span></div>
+        <div class="fact">⚠️ Risk Signals: <span id="risks"></span></div>
+        <div class="fact">🌐 Network Safety: <span id="network"></span></div>
+      </div>
+
+      <!-- WHY -->
       <div class="section">
         <h4>Why this score?</h4>
         <div id="whyText"></div>
       </div>
 
-      <!-- ACTION SECTION -->
+      <!-- ACTION -->
       <div class="action">
         <strong>Recommended action:</strong>
         <div id="actionText"></div>
@@ -217,6 +239,9 @@ function checkHealth(){
   const statusEl=document.getElementById("status");
   const gauge=document.getElementById("gauge");
   const center=document.getElementById("center");
+  const approvals=document.getElementById("approvals");
+  const risks=document.getElementById("risks");
+  const network=document.getElementById("network");
   const whyText=document.getElementById("whyText");
   const actionText=document.getElementById("actionText");
   const gaugeBox=document.getElementById("gaugeBox");
@@ -231,29 +256,29 @@ function checkHealth(){
   if(score<40){
     statusEl.className="status fear";
     statusEl.innerText="🔴 High Risk";
-    whyText.innerHTML=
-      "• Multiple old token approvals detected<br>" +
-      "• Possible unlimited approval present";
-    actionText.innerHTML=
-      "Review and revoke old or unlimited approvals using a trusted revoke tool.";
+    approvals.innerText="6 approvals";
+    risks.innerText="Multiple risky approvals detected";
+    network.innerText="Unusual interactions found";
+    whyText.innerHTML="• Multiple old approvals<br>• Possible unlimited token approval";
+    actionText.innerHTML="Revoke old or unlimited approvals using a trusted revoke tool.";
   }
   else if(score<70){
     statusEl.className="status neutral";
     statusEl.innerText="🟡 Moderate Risk";
-    whyText.innerHTML=
-      "• Some approvals are older than 3 months<br>" +
-      "• Normal wallet activity detected";
-    actionText.innerHTML=
-      "Consider revoking unused approvals to improve wallet safety.";
+    approvals.innerText="5 approvals";
+    risks.innerText="No major risks";
+    network.innerText="Safe network usage";
+    whyText.innerHTML="• Some approvals older than 3 months<br>• Normal wallet activity detected";
+    actionText.innerHTML="Consider revoking unused approvals to improve wallet safety.";
   }
   else{
-    statusEl.className="status greend";
+    statusEl.className="status green";
     statusEl.innerText="🟢 Healthy Wallet";
-    whyText.innerHTML=
-      "• No suspicious approvals found<br>" +
-      "• Wallet activity looks normal";
-    actionText.innerHTML=
-      "No immediate action needed. Continue safe wallet practices.";
+    approvals.innerText="1 approval";
+    risks.innerText="No risky signals";
+    network.innerText="Secure usage";
+    whyText.innerHTML="• No suspicious approvals<br>• Clean wallet activity";
+    actionText.innerHTML="No action needed. Continue safe wallet practices.";
   }
 
   gaugeBox.style.display="block";
