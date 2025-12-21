@@ -66,7 +66,6 @@
       margin-top: 10px;
     }
 
-    /* Gauge */
     .gauge-box {
       display: none;
       margin-top: 22px;
@@ -185,43 +184,50 @@
 
   <script>
     function checkHealth() {
+      const walletInput = document.getElementById("walletInput");
       const wallet = walletInput.value.trim();
+
       if (wallet.length < 10) {
         alert("Enter valid wallet address");
         return;
       }
 
+      const scoreEl = document.getElementById("score");
+      const statusEl = document.getElementById("status");
+      const gauge = document.getElementById("gauge");
+      const approvalsEl = document.getElementById("approvals");
+      const risksEl = document.getElementById("risks");
+      const networkEl = document.getElementById("network");
+      const gaugeBox = document.getElementById("gaugeBox");
+
       const score = 20 + (wallet.length % 80);
       scoreEl.innerText = score;
-
-      const gauge = document.getElementById("gauge");
-      const statusEl = document.getElementById("status");
 
       const rotation = (score / 100) * 360;
       gauge.style.transform = `rotate(${rotation}deg)`;
 
-      let statusClass = "";
       let statusText = "";
+      let statusClass = "";
 
       if (score < 40) {
-        statusClass = "fear";
         statusText = "🔴 Fear (High Risk)";
+        statusClass = "fear";
       } else if (score < 70) {
-        statusClass = "neutral";
         statusText = "🟡 Neutral Risk";
+        statusClass = "neutral";
       } else {
-        statusClass = "greed";
         statusText = "🟢 Greed (Healthy Wallet)";
+        statusClass = "greed";
       }
 
       statusEl.className = "status " + statusClass;
       statusEl.innerText = statusText;
 
-      approvals.innerText = score > 65 ? "1 approval" : "5 approvals";
-      risks.innerText = score < 40 ? "Suspicious contract activity" : "No major risks";
-      network.innerText = score > 50 ? "Safe network usage" : "Unusual interactions";
+      approvalsEl.innerText = score > 65 ? "1 approval" : "5 approvals";
+      risksEl.innerText = score < 40 ? "Suspicious contract activity" : "No major risks";
+      networkEl.innerText = score > 50 ? "Safe network usage" : "Unusual interactions";
 
-      document.getElementById("gaugeBox").style.display = "block";
+      gaugeBox.style.display = "block";
     }
   </script>
 </body>
