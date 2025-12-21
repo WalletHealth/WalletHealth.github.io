@@ -65,18 +65,18 @@ button{
   margin-top:10px;
 }
 
-/* Gauge */
-.gauge-box{
+/* RESULT */
+.result{
   display:none;
   margin-top:22px;
-  text-align:center;
 }
 
+/* GAUGE */
 .gauge{
   width:200px;
   height:200px;
   border-radius:50%;
-  margin:auto;
+  margin:16px auto;
   background:conic-gradient(
     #ef4444 0deg,
     #facc15 120deg,
@@ -105,7 +105,6 @@ button{
   left:50%;
   transform:translate(-50%,-50%);
   text-align:center;
-  z-index:2;
 }
 
 .score{
@@ -113,57 +112,60 @@ button{
   font-weight:bold;
 }
 
-.label{
-  font-size:13px;
-  color:#9ca3af;
-}
-
 .status{
-  margin-top:10px;
-  font-size:15px;
+  text-align:center;
+  font-size:16px;
   font-weight:bold;
+  margin-bottom:16px;
 }
 
 .fear{color:#ef4444;}
 .neutral{color:#facc15;}
-.green{color:#22c55e;}
+.safe{color:#22c55e;}
 
-/* FACT CARDS */
-.facts{
-  display:grid;
-  grid-template-columns:1fr;
-  gap:10px;
-  margin-top:16px;
-}
-
-.fact{
+/* SECTION BLOCKS */
+.block{
   background:#0f172a;
-  padding:10px;
-  border-radius:10px;
-  font-size:14px;
+  border-radius:14px;
+  padding:14px;
+  margin-bottom:14px;
 }
 
-/* WHY + ACTION */
-.section{
-  margin-top:16px;
-  background:#0f172a;
-  padding:12px;
-  border-radius:12px;
-  font-size:14px;
-}
-
-.section h4{
-  margin:0 0 6px 0;
+.block h4{
+  margin:0 0 8px 0;
   font-size:14px;
   color:#9ca3af;
 }
 
+/* FACT GRID */
+.fact-grid{
+  display:grid;
+  grid-template-columns:1fr;
+  gap:8px;
+  font-size:14px;
+}
+
+/* ACTION */
 .action{
-  margin-top:10px;
-  padding:10px;
   background:#071a17;
   border-left:4px solid #00ffd5;
-  border-radius:8px;
+}
+
+/* CTA */
+.cta{
+  margin-top:10px;
+  text-align:center;
+}
+
+.cta a{
+  display:inline-block;
+  margin-top:8px;
+  padding:10px 14px;
+  border-radius:10px;
+  background:#00ffd5;
+  color:#000;
+  text-decoration:none;
+  font-weight:bold;
   font-size:14px;
 }
 
@@ -190,34 +192,54 @@ button{
       🔒 Read-only • No wallet connect • No private keys
     </div>
 
-    <div id="gaugeBox" class="gauge-box">
+    <div id="result" class="result">
+
+      <!-- GAUGE -->
       <div id="gauge" class="gauge">
-        <div id="center" class="center">
+        <div class="center">
           <div id="score" class="score">0</div>
-          <div class="label">Health Index</div>
+          <div style="font-size:13px;color:#9ca3af;">Health Index</div>
         </div>
       </div>
 
       <div id="status" class="status"></div>
 
       <!-- FACTS -->
-      <div class="facts">
-        <div class="fact">🔑 Active Approvals: <span id="approvals"></span></div>
-        <div class="fact">⚠️ Risk Signals: <span id="risks"></span></div>
-        <div class="fact">🌐 Network Safety: <span id="network"></span></div>
+      <div class="block">
+        <h4>Quick facts</h4>
+        <div class="fact-grid">
+          🔑 Active approvals: <span id="approvals"></span><br>
+          ⚠️ Risk signals: <span id="risks"></span><br>
+          🌐 Network safety: <span id="network"></span>
+        </div>
+      </div>
+
+      <!-- RISK SOURCES -->
+      <div class="block">
+        <h4>Potential risk sources</h4>
+        <div id="sources"></div>
       </div>
 
       <!-- WHY -->
-      <div class="section">
+      <div class="block">
         <h4>Why this score?</h4>
-        <div id="whyText"></div>
+        <div id="why"></div>
       </div>
 
       <!-- ACTION -->
-      <div class="action">
-        <strong>Recommended action:</strong>
-        <div id="actionText"></div>
+      <div class="block action">
+        <strong>Recommended action</strong>
+        <div id="action"></div>
+        <div class="cta">
+          <a href="https://revoke.cash" target="_blank">
+            Open trusted revoke tool
+          </a>
+          <div style="font-size:12px;color:#9ca3af;margin-top:6px;">
+            Revoking unused approvals can improve score by +15 to +25
+          </div>
+        </div>
       </div>
+
     </div>
   </div>
 
@@ -235,53 +257,39 @@ function checkHealth(){
     return;
   }
 
-  const scoreEl=document.getElementById("score");
-  const statusEl=document.getElementById("status");
-  const gauge=document.getElementById("gauge");
-  const center=document.getElementById("center");
-  const approvals=document.getElementById("approvals");
-  const risks=document.getElementById("risks");
-  const network=document.getElementById("network");
-  const whyText=document.getElementById("whyText");
-  const actionText=document.getElementById("actionText");
-  const gaugeBox=document.getElementById("gaugeBox");
-
   const score=20+(wallet.length%80);
-  scoreEl.innerText=score;
+  document.getElementById("score").innerText=score;
+  document.getElementById("result").style.display="block";
 
   const rotation=(score/100)*360;
-  gauge.style.transform=`rotate(${rotation}deg)`;
-  center.style.transform=`translate(-50%,-50%) rotate(${-rotation}deg)`;
+  document.getElementById("gauge").style.transform=`rotate(${rotation}deg)`;
 
-  if(score<40){
-    statusEl.className="status fear";
-    statusEl.innerText="🔴 High Risk";
-    approvals.innerText="6 approvals";
-    risks.innerText="Multiple risky approvals detected";
-    network.innerText="Unusual interactions found";
-    whyText.innerHTML="• Multiple old approvals<br>• Possible unlimited token approval";
-    actionText.innerHTML="Revoke old or unlimited approvals using a trusted revoke tool.";
-  }
-  else if(score<70){
-    statusEl.className="status neutral";
-    statusEl.innerText="🟡 Moderate Risk";
-    approvals.innerText="5 approvals";
-    risks.innerText="No major risks";
-    network.innerText="Safe network usage";
-    whyText.innerHTML="• Some approvals older than 3 months<br>• Normal wallet activity detected";
-    actionText.innerHTML="Consider revoking unused approvals to improve wallet safety.";
-  }
-  else{
-    statusEl.className="status green";
-    statusEl.innerText="🟢 Healthy Wallet";
-    approvals.innerText="1 approval";
-    risks.innerText="No risky signals";
-    network.innerText="Secure usage";
-    whyText.innerHTML="• No suspicious approvals<br>• Clean wallet activity";
-    actionText.innerHTML="No action needed. Continue safe wallet practices.";
-  }
+  let status="",cls="";
+  if(score<40){status="🔴 High Risk";cls="fear";}
+  else if(score<70){status="🟡 Moderate Risk";cls="neutral";}
+  else{status="🟢 Healthy Wallet";cls="safe";}
+  const st=document.getElementById("status");
+  st.innerText=status;
+  st.className="status "+cls;
 
-  gaugeBox.style.display="block";
+  document.getElementById("approvals").innerText=
+    score<40?"6 approvals":"5 approvals";
+  document.getElementById("risks").innerText=
+    score<40?"Multiple risky approvals":"No major risks";
+  document.getElementById("network").innerText="Safe network usage";
+
+  document.getElementById("sources").innerHTML=
+    "• Old token approval (6+ months)<br>• Possible unlimited approval<br>• Inactive DApp interaction";
+
+  document.getElementById("why").innerHTML=
+    score<70?
+    "Some approvals are older than 3 months. Wallet activity looks normal.":
+    "No suspicious approvals detected. Clean activity.";
+
+  document.getElementById("action").innerText=
+    score<70?
+    "Review and revoke unused approvals to reduce attack surface.":
+    "No immediate action required. Maintain safe practices.";
 }
 </script>
 </body>
