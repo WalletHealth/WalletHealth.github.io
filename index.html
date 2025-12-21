@@ -99,7 +99,6 @@ button{
   transform:translate(-50%,-50%);
 }
 
-/* Center (counter-rotated) */
 .center{
   position:absolute;
   top:50%;
@@ -127,15 +126,30 @@ button{
 
 .fear{color:#ef4444;}
 .neutral{color:#facc15;}
-.greed{color:#22c55e;}
+.greend{color:#22c55e;}
 
-.info{
-  margin-top:14px;
+.section{
+  margin-top:16px;
   background:#0f172a;
-  padding:10px;
-  border-radius:10px;
-  font-size:14px;
+  padding:12px;
+  border-radius:12px;
   text-align:left;
+  font-size:14px;
+}
+
+.section h4{
+  margin:0 0 6px 0;
+  font-size:14px;
+  color:#9ca3af;
+}
+
+.action{
+  margin-top:10px;
+  padding:10px;
+  background:#071a17;
+  border-left:4px solid #00ffd5;
+  border-radius:8px;
+  font-size:14px;
 }
 
 .footer{
@@ -171,10 +185,16 @@ button{
 
       <div id="status" class="status"></div>
 
-      <div class="info">
-        🔑 Active Approvals: <span id="approvals"></span><br/>
-        ⚠️ Risk Signals: <span id="risks"></span><br/>
-        🌐 Network Safety: <span id="network"></span>
+      <!-- WHY SECTION -->
+      <div class="section">
+        <h4>Why this score?</h4>
+        <div id="whyText"></div>
+      </div>
+
+      <!-- ACTION SECTION -->
+      <div class="action">
+        <strong>Recommended action:</strong>
+        <div id="actionText"></div>
       </div>
     </div>
   </div>
@@ -197,11 +217,8 @@ function checkHealth(){
   const statusEl=document.getElementById("status");
   const gauge=document.getElementById("gauge");
   const center=document.getElementById("center");
-
-  const approvals=document.getElementById("approvals");
-  const risks=document.getElementById("risks");
-  const network=document.getElementById("network");
-
+  const whyText=document.getElementById("whyText");
+  const actionText=document.getElementById("actionText");
   const gaugeBox=document.getElementById("gaugeBox");
 
   const score=20+(wallet.length%80);
@@ -211,24 +228,33 @@ function checkHealth(){
   gauge.style.transform=`rotate(${rotation}deg)`;
   center.style.transform=`translate(-50%,-50%) rotate(${-rotation}deg)`;
 
-  let statusClass="",statusText="";
   if(score<40){
-    statusClass="fear";
-    statusText="🔴 Fear (High Risk)";
-  }else if(score<70){
-    statusClass="neutral";
-    statusText="🟡 Neutral Risk";
-  }else{
-    statusClass="greed";
-    statusText="🟢 Greed (Healthy Wallet)";
+    statusEl.className="status fear";
+    statusEl.innerText="🔴 High Risk";
+    whyText.innerHTML=
+      "• Multiple old token approvals detected<br>" +
+      "• Possible unlimited approval present";
+    actionText.innerHTML=
+      "Review and revoke old or unlimited approvals using a trusted revoke tool.";
   }
-
-  statusEl.className="status "+statusClass;
-  statusEl.innerText=statusText;
-
-  approvals.innerText=score>65?"1 approval":"5 approvals";
-  risks.innerText=score<40?"Suspicious activity":"No major risks";
-  network.innerText=score>50?"Safe network usage":"Unusual interactions";
+  else if(score<70){
+    statusEl.className="status neutral";
+    statusEl.innerText="🟡 Moderate Risk";
+    whyText.innerHTML=
+      "• Some approvals are older than 3 months<br>" +
+      "• Normal wallet activity detected";
+    actionText.innerHTML=
+      "Consider revoking unused approvals to improve wallet safety.";
+  }
+  else{
+    statusEl.className="status greend";
+    statusEl.innerText="🟢 Healthy Wallet";
+    whyText.innerHTML=
+      "• No suspicious approvals found<br>" +
+      "• Wallet activity looks normal";
+    actionText.innerHTML=
+      "No immediate action needed. Continue safe wallet practices.";
+  }
 
   gaugeBox.style.display="block";
 }
