@@ -142,13 +142,13 @@
       </div>
 
       <div id="result" class="result">
-        <div id="score" class="score safe">
-          Health Score: 82
-        </div>
-        <div id="status" class="status">
-          Status: ✅ Safe
-        </div>
-      </div>
+  <div id="score" class="score safe">
+    Health Score: 82
+  </div>
+  <div id="status" class="status">
+    Status: ✅ Safe
+  </div>
+</div>
     </div>
 
     <div class="footer">
@@ -196,7 +196,17 @@
     scoreEl.className = "score " + statusClass;
     statusEl.innerText = statusText;
 
-    resultBox.style.display = "block";
+    // Fake alert logic (demo)
+document.getElementById("approvals").innerText =
+  score > 70 ? "1" : "5";
+
+document.getElementById("risks").innerText =
+  score < 50 ? "Suspicious contract interaction detected" : "No critical issues";
+
+document.getElementById("gas").innerText =
+  score > 60 ? "Low / Normal" : "High";
+
+document.getElementById("alerts").style.display = "block";
   }
 </script>
 </body>
