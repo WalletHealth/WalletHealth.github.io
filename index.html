@@ -1,213 +1,133 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>WalletHealth – Crypto Wallet Health Dashboard</title>
+<meta charset="UTF-8" />
+<title>WalletHealth</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
 
-  <style>
-    :root {
-      --bg: #0b1020;
-      --card: #121a2f;
-      --accent: #22f3d6;
-      --text: #ffffff;
-      --muted: #9aa4c7;
-      --green: #2ecc71;
-      --yellow: #f1c40f;
-      --red: #e74c3c;
-    }
-
-    * { box-sizing: border-box; font-family: system-ui, -apple-system, BlinkMacSystemFont; }
-
-    body {
-      margin: 0;
-      min-height: 100vh;
-      background: radial-gradient(circle at top, #121a2f, #070b16);
-      color: var(--text);
-      display: flex;
-      justify-content: center;
-      align-items: flex-start;
-      padding: 40px 16px;
-    }
-
-    .app {
-      width: 100%;
-      max-width: 420px;
-    }
-
-    h1 {
-      text-align: center;
-      margin-bottom: 6px;
-    }
-
-    .subtitle {
-      text-align: center;
-      color: var(--muted);
-      margin-bottom: 24px;
-    }
-
-    .input-box {
-      background: var(--card);
-      border-radius: 14px;
-      padding: 16px;
-      margin-bottom: 20px;
-    }
-
-    input {
-      width: 100%;
-      padding: 12px;
-      border-radius: 10px;
-      border: none;
-      outline: none;
-      background: #0e1528;
-      color: white;
-      font-size: 14px;
-    }
-
-    button {
-      width: 100%;
-      margin-top: 12px;
-      padding: 14px;
-      border-radius: 12px;
-      border: none;
-      background: linear-gradient(90deg, #22f3d6, #3aa0ff);
-      font-size: 16px;
-      font-weight: 600;
-      cursor: pointer;
-    }
-
-    .note {
-      text-align: center;
-      font-size: 12px;
-      color: var(--muted);
-      margin-top: 8px;
-    }
-
-    .card {
-      background: var(--card);
-      border-radius: 16px;
-      padding: 20px;
-      margin-top: 20px;
-      display: none;
-    }
-
-    .score-circle {
-      width: 180px;
-      height: 180px;
-      border-radius: 50%;
-      margin: 0 auto;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      font-size: 42px;
-      font-weight: bold;
-      background: conic-gradient(var(--green) 0%, var(--yellow) 50%, var(--red) 100%);
-    }
-
-    .status {
-      text-align: center;
-      margin-top: 12px;
-      font-size: 20px;
-      font-weight: 600;
-    }
-
-    .desc {
-      text-align: center;
-      color: var(--muted);
-      margin-top: 6px;
-      font-size: 14px;
-    }
-
-    .facts {
-      margin-top: 18px;
-      font-size: 14px;
-      line-height: 1.6;
-    }
-
-    .fact {
-      margin-bottom: 8px;
-    }
-
-    footer {
-      text-align: center;
-      margin-top: 24px;
-      font-size: 12px;
-      color: var(--muted);
-    }
-  </style>
+<style>
+body {
+  margin: 0;
+  font-family: system-ui, sans-serif;
+  background: radial-gradient(circle at top, #0f172a, #020617);
+  color: #fff;
+}
+.container {
+  max-width: 420px;
+  margin: auto;
+  padding: 30px 16px 60px;
+}
+h1 {
+  text-align: center;
+  margin-bottom: 4px;
+}
+.subtitle {
+  text-align: center;
+  opacity: 0.7;
+  margin-bottom: 24px;
+}
+input {
+  width: 100%;
+  padding: 14px;
+  border-radius: 12px;
+  border: none;
+  outline: none;
+  font-size: 14px;
+}
+button {
+  width: 100%;
+  margin-top: 14px;
+  padding: 14px;
+  border-radius: 14px;
+  border: none;
+  font-size: 16px;
+  background: linear-gradient(90deg, #22d3ee, #3b82f6);
+  color: #000;
+  font-weight: bold;
+}
+.card {
+  margin-top: 24px;
+  background: rgba(255,255,255,0.05);
+  border-radius: 20px;
+  padding: 20px;
+}
+.score {
+  font-size: 56px;
+  text-align: center;
+}
+.label {
+  text-align: center;
+  font-size: 20px;
+  margin-bottom: 10px;
+}
+.explain {
+  font-size: 13px;
+  opacity: 0.85;
+  line-height: 1.6;
+}
+.footer {
+  text-align: center;
+  opacity: 0.4;
+  margin-top: 30px;
+  font-size: 12px;
+}
+</style>
 </head>
+
 <body>
+<div class="container">
+  <h1>WalletHealth</h1>
+  <div class="subtitle">Crypto Wallet Health Dashboard</div>
 
-  <div class="app">
-    <h1>WalletHealth</h1>
-    <div class="subtitle">Crypto Wallet Health Dashboard</div>
+  <input id="addr" placeholder="Paste ETH or BTC address" />
+  <button onclick="check()">Check Wallet Health</button>
 
-    <div class="input-box">
-      <input id="address" placeholder="Paste wallet address (ETH / BTC)" />
-      <button onclick="checkWallet()">Check Wallet Health</button>
-      <div class="note">🔒 Read-only • No wallet connect • No private keys</div>
-    </div>
+  <div id="result"></div>
 
-    <div class="card" id="result">
-      <div class="score-circle" id="score">–</div>
-      <div class="status" id="statusText"></div>
-      <div class="desc" id="desc"></div>
-
-      <div class="facts" id="facts"></div>
-    </div>
-
-    <footer>© 2025 WalletHealth • Not financial advice</footer>
+  <div class="footer">
+    🔒 Read-only · No wallet connect · No private keys<br />
+    © 2025 WalletHealth · Not financial advice
   </div>
+</div>
 
 <script>
-const API = "https://wallethealth-api.singh-wsg.workers.dev/";
+const API = "https://wallethealth-api.singh-wsg.workers.dev";
 
-function calculateScore(balance) {
-  if (balance === null) return 30;
-  if (balance === 0) return 40;
-  if (balance < 0.1) return 55;
-  if (balance < 1) return 70;
-  return 85;
-}
+async function check() {
+  const addr = document.getElementById("addr").value.trim();
+  if (!addr) return;
 
-function statusFromScore(score) {
-  if (score < 45) return ["Low Activity Wallet", "This wallet shows very low or no on-chain balance."];
-  if (score < 65) return ["Moderate Risk", "Wallet is active but could be optimized for safety."];
-  if (score < 80) return ["Healthy Wallet", "Wallet activity and balance look healthy."];
-  return ["Very Healthy", "Strong balance and normal on-chain behavior detected."];
-}
-
-async function checkWallet() {
-  const addr = document.getElementById("address").value.trim();
-  if (!addr) return alert("Please enter a wallet address");
-
-  document.getElementById("result").style.display = "block";
-  document.getElementById("score").innerText = "…";
+  document.getElementById("result").innerHTML = "Loading…";
 
   try {
-    const res = await fetch(API + "?address=" + addr);
-    const data = await res.json();
+    const res = await fetch(`${API}/?address=${addr}`);
+    const d = await res.json();
 
-    const balance = data.balance ?? 0;
-    const score = calculateScore(balance);
-    const [status, desc] = statusFromScore(score);
+    if (d.error) {
+      document.getElementById("result").innerHTML = d.error;
+      return;
+    }
 
-    document.getElementById("score").innerText = score;
-    document.getElementById("statusText").innerText = status;
-    document.getElementById("desc").innerText = desc;
+    document.getElementById("result").innerHTML = `
+      <div class="card">
+        <div class="score">${d.score}</div>
+        <div class="label">${d.label}</div>
 
-    document.getElementById("facts").innerHTML = `
-      <div class="fact">🌐 Network: <b>${data.network}</b></div>
-      <div class="fact">💰 Balance: <b>${balance} ${data.unit}</b></div>
-      <div class="fact">🧠 Score logic: Based on real on-chain balance</div>
+        <div class="explain">
+          🌐 Network: <b>${d.network}</b><br />
+          💰 Balance: <b>${d.balance} ${d.unit}</b><br /><br />
+
+          🧠 <b>Why this score?</b><br />
+          • ${d.explanation.balance}<br />
+          • ${d.explanation.walletType ?? d.explanation.activity}<br />
+          • ${d.explanation.note}
+        </div>
+      </div>
     `;
   } catch (e) {
-    document.getElementById("score").innerText = "–";
-    document.getElementById("statusText").innerText = "Data unavailable";
-    document.getElementById("desc").innerText = "Unable to fetch on-chain data right now.";
+    document.getElementById("result").innerHTML = "Failed to fetch data";
   }
 }
 </script>
-
 </body>
 </html>
