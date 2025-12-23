@@ -1,23 +1,26 @@
 const API_URL = "https://wallethealth-api.singh-wsg.workers.dev";
 
 /* ---------------- INIT ---------------- */
-
 document.addEventListener("DOMContentLoaded", () => {
-  console.log("✅ WalletHealth script loaded");
+  const btn = document.getElementById("checkBtn");
+  if (!btn) {
+    console.error("Button not found");
+    return;
+  }
+  btn.addEventListener("click", checkWallet);
 });
 
 /* ---------------- MAIN ---------------- */
-
 async function checkWallet() {
-  const input = document.getElementById("addressInput");
+  const input = document.getElementById("walletInput");
   if (!input) {
-    alert("Address input not found");
+    alert("Wallet input not found");
     return;
   }
 
   const address = input.value.trim();
   if (!address) {
-    alert("Please enter a wallet address");
+    alert("Please enter wallet address");
     return;
   }
 
@@ -27,8 +30,6 @@ async function checkWallet() {
     const res = await fetch(`${API_URL}?address=${address}`);
     const data = await res.json();
 
-    console.log("API RESPONSE:", data);
-
     if (data.error) {
       alert(data.error);
       return;
@@ -37,90 +38,68 @@ async function checkWallet() {
     const health = calculateWalletHealth(data);
     renderResult(data, health);
 
-  } catch (err) {
-    console.error(err);
-    alert("Failed to fetch wallet data");
+  } catch (e) {
+    console.error(e);
+    alert("Failed to fetch data");
   }
 }
 
 /* ---------------- HEALTH ENGINE ---------------- */
-
 function calculateWalletHealth(api) {
   let score = 0;
   const reasons = [];
   const actions = [];
 
   const balance = api.balance?.value ?? 0;
-  const txCount = api.activity?.txCount ?? 0;
+  const tx = api.activity?.txCount ?? 0;
   const dormant = api.flags?.isDormant ?? false;
-  const network = api.meta?.network;
-  const approvalsSupported = api.approvals?.supported ?? false;
+  const network = api.meta.network;
 
   if (balance > 0) score += 30;
-  else {
-    score += 10;
-    reasons.push("Wallet has zero balance.");
-  }
+  else reasons.push("Wallet has zero balance");
 
-  if (txCount > 0) score += 25;
-  else {
-    score += 10;
-    reasons.push("Low or no on-chain activity.");
-  }
+  if (tx > 0) score += 25;
+  else reasons.push("Low or no on-chain activity");
 
-  if (network === "Bitcoin") score += 20;
-  else score += 15;
-
-  if (approvalsSupported) score += 10;
+  score += network === "Bitcoin" ? 20 : 15;
 
   if (dormant) {
     score -= 10;
-    reasons.push("Wallet appears dormant.");
-    actions.push("Review wallet usage periodically.");
+    actions.push("Review wallet activity periodically");
   }
 
   score = Math.max(0, Math.min(100, score));
 
   return {
     score,
-    label: getScoreLabel(score),
+    label: score >= 70 ? "Healthy" : score >= 50 ? "Needs Attention" : "Risky",
     reasons,
     actions
   };
 }
 
-function getScoreLabel(score) {
-  if (score >= 90) return "Very Healthy";
-  if (score >= 70) return "Healthy";
-  if (score >= 50) return "Needs Attention";
-  return "Risky";
-}
-
 /* ---------------- RENDER ---------------- */
-
 function renderResult(api, health) {
   showResult();
 
-  document.getElementById("scoreCircle").innerText = health.score;
+  document.getElementById("score").innerText = health.score;
   document.getElementById("network").innerText = api.meta.network;
-  document.getElementById("walletType").innerText = api.meta.addressType;
   document.getElementById("balance").innerText =
     `${api.balance.value} ${api.balance.unit}`;
-  document.getElementById("statusLabel").innerText = health.label;
+  document.getElementById("status").innerText = health.label;
 
   document.getElementById("reasons").innerHTML =
     health.reasons.length
-      ? health.reasons.map(r => `<li>${r}</li>`).join("")
-      : "<li>No major risk signals detected.</li>";
+      ? `<ul>${health.reasons.map(r => `<li>${r}</li>`).join("")}</ul>`
+      : "<p>No major risk signals detected.</p>";
 
   document.getElementById("actions").innerHTML =
     health.actions.length
-      ? health.actions.map(a => `<li>${a}</li>`).join("")
-      : "<li>Keep wallet hygiene strong.</li>";
+      ? `<ul>${health.actions.map(a => `<li>${a}</li>`).join("")}</ul>`
+      : "<p>Keep wallet hygiene strong.</p>";
 }
 
 /* ---------------- VISIBILITY ---------------- */
-
 function showResult() {
   document.getElementById("result").classList.remove("hidden");
 }
