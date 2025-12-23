@@ -46,33 +46,53 @@ async function checkWallet() {
 
 /* ---------------- HEALTH ENGINE ---------------- */
 function calculateWalletHealth(api) {
-  let score = 0;
+  let score = 50; // neutral base
   const reasons = [];
   const actions = [];
 
   const balance = api.balance?.value ?? 0;
-  const tx = api.activity?.txCount ?? 0;
+  const txCount = api.activity?.txCount ?? 0;
   const dormant = api.flags?.isDormant ?? false;
-  const network = api.meta.network;
+  const network = api.meta?.network;
 
-  if (balance > 0) score += 30;
-  else reasons.push("Wallet has zero balance");
+  if (network === "Bitcoin") {
+    // BTC logic
+    if (balance > 0) score += 30;
+    else {
+      score -= 15;
+      reasons.push("Wallet has zero BTC balance");
+    }
 
-  if (tx > 0) score += 25;
-  else reasons.push("Low or no on-chain activity");
+    if (txCount > 0) score += 25;
+    else reasons.push("Low or no transaction history");
 
-  score += network === "Bitcoin" ? 20 : 15;
+    if (!dormant) score += 20;
+    else {
+      score -= 20;
+      reasons.push("Bitcoin wallet appears dormant");
+      actions.push("Consider reviewing long-term BTC storage");
+    }
 
-  if (dormant) {
-    score -= 10;
-    actions.push("Review wallet activity periodically");
+  } else {
+    // ETH logic
+    if (txCount > 0) score += 30;
+    else reasons.push("No recent Ethereum transactions");
+
+    if (!dormant) score += 30;
+    else {
+      score -= 30;
+      reasons.push("Ethereum wallet is dormant");
+      actions.push("Check token approvals and activity");
+    }
+
+    if (balance > 0) score += 10;
   }
 
   score = Math.max(0, Math.min(100, score));
 
   return {
     score,
-    label: score >= 70 ? "Healthy" : score >= 50 ? "Needs Attention" : "Risky",
+    label: getScoreLabel(score),
     reasons,
     actions
   };
