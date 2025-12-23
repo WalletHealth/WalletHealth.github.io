@@ -1,15 +1,51 @@
+/*********************************************************
+ * WalletHealth – FINAL FRONTEND SCRIPT
+ * Works on:
+ * - Mobile browsers
+ * - GitHub Pages
+ * - Cloudflare Workers backend
+ *********************************************************/
+
 const API_URL = "https://wallethealth-api.singh-wsg.workers.dev";
 
-async function checkWallet() {
-  const address = document.getElementById("walletInput").value.trim();
-  if (!address) {
-    alert("Please enter wallet address");
+/* -------------------------------------------------------
+   INIT – ensure JS runs after DOM is ready
+------------------------------------------------------- */
+document.addEventListener("DOMContentLoaded", () => {
+  const btn = document.getElementById("checkBtn");
+
+  if (!btn) {
+    console.error("❌ Button #checkBtn not found");
     return;
   }
+
+  btn.addEventListener("click", checkWallet);
+  console.log("✅ WalletHealth script loaded");
+});
+
+/* -------------------------------------------------------
+   MAIN – Fetch wallet data
+------------------------------------------------------- */
+async function checkWallet() {
+  const input = document.getElementById("walletInput");
+  if (!input) {
+    alert("Wallet input not found in HTML");
+    return;
+  }
+
+  const address = input.value.trim();
+  if (!address) {
+    alert("Please enter a wallet address");
+    return;
+  }
+
+  hideResult();
 
   try {
     const res = await fetch(`${API_URL}?address=${address}`);
     const data = await res.json();
+
+    console.log("API RESPONSE:", data);
 
     if (data.error) {
       alert(data.error);
@@ -20,64 +56,61 @@ async function checkWallet() {
     renderResult(data, health);
 
   } catch (err) {
-    alert("Unable to fetch wallet data");
+    console.error(err);
+    alert("Failed to fetch wallet data");
   }
 }
 
-/* ================= SCORE ENGINE ================= */
-
+/* -------------------------------------------------------
+   SCORE ENGINE (FRONTEND ONLY)
+------------------------------------------------------- */
 function calculateWalletHealth(api) {
   let score = 0;
   const reasons = [];
   const actions = [];
 
-  /* BALANCE */
-  if (api.balance.value > 0) {
+  const balance = api.balance?.value ?? 0;
+  const txCount = api.activity?.txCount ?? 0;
+  const approvals = api.approvals?.supported ?? false;
+  const dormant = api.flags?.isDormant ?? false;
+  const network = api.meta?.network;
+
+  // Balance
+  if (balance > 0) {
     score += 30;
-    reasons.push("Wallet holds funds.");
   } else {
     score += 10;
-    reasons.push("Wallet balance is zero.");
-    actions.push("Transfer small funds to keep wallet active.");
+    reasons.push("Zero balance wallet");
   }
 
-  /* ACTIVITY */
-  const tx = api.activity.txCount || 0;
-  if (tx >= 100) {
+  // Activity
+  if (txCount > 0) {
     score += 25;
-    reasons.push("High on-chain activity.");
-  } else if (tx > 0) {
-    score += 15;
-    reasons.push("Some on-chain activity detected.");
   } else {
-    score += 5;
-    reasons.push("No transaction history found.");
-    actions.push("Send a self transaction to activate wallet.");
+    score += 10;
+    reasons.push("No on-chain activity");
   }
 
-  /* APPROVALS */
-  if (!api.approvals.supported) {
-    score += 25;
-    reasons.push("No token approval risk (Bitcoin wallet).");
-  } else if (api.approvals.unlimitedCount > 0) {
-    score += 5;
-    reasons.push("Unlimited token approvals detected.");
-    actions.push("Revoke risky token approvals.");
-  } else {
-    score += 25;
-    reasons.push("No risky token approvals found.");
-  }
-
-  /* DORMANCY */
-  if (!api.flags.isDormant) {
+  // Network type
+  if (network === "Bitcoin") {
     score += 20;
   } else {
-    score += 5;
-    reasons.push("Wallet appears inactive.");
-    actions.push("Check wallet periodically to avoid dormancy.");
+    score += 15;
   }
 
-  score = Math.min(score, 100);
+  // Approvals (ETH only)
+  if (approvals) {
+    score += 15;
+  }
+
+  // Dormant flag
+  if (dormant) {
+    score -= 10;
+    reasons.push("Wallet appears dormant");
+    actions.push("Consider moving funds or verifying access");
+  }
+
+  score = Math.max(0, Math.min(100, score));
 
   return {
     score,
@@ -90,26 +123,50 @@ function calculateWalletHealth(api) {
 function getScoreLabel(score) {
   if (score >= 90) return "Very Healthy";
   if (score >= 70) return "Healthy";
-  if (score >= 40) return "Needs Attention";
+  if (score >= 50) return "Needs Attention";
   return "Risky";
 }
 
-/* ================= UI RENDER ================= */
-
+/* -------------------------------------------------------
+   UI RENDER
+------------------------------------------------------- */
 function renderResult(api, health) {
-  document.getElementById("score").innerText = health.score;
-  document.getElementById("status").innerText = health.label;
-  document.getElementById("network").innerText = api.meta.network;
-  document.getElementById("balance").innerText =
-    `${api.balance.value} ${api.balance.unit}`;
+  showResult();
 
-  const reasonBox = document.getElementById("reasons");
-  reasonBox.innerHTML = health.reasons.length
-    ? health.reasons.map(r => `<li>${r}</li>`).join("")
-    : "<li>No major risk signals detected.</li>";
+  setText("score", health.score);
+  setText("status", health.label);
+  setText("network", api.meta.network);
+  setText(
+    "balance",
+    `${api.balance.value} ${api.balance.unit}`
+  );
 
-  const actionBox = document.getElementById("actions");
-  actionBox.innerHTML = health.actions.length
-    ? health.actions.map(a => `<li>${a}</li>`).join("")
-    : "<li>Keep wallet hygiene strong.</li>";
+  const reasonsBox = document.getElementById("reasons");
+  const actionsBox = document.getElementById("actions");
+
+  reasonsBox.innerHTML = health.reasons.length
+    ? `<ul>${health.reasons.map(r => `<li>${r}</li>`).join("")}</ul>`
+    : "<p>No major risk signals detected.</p>";
+
+  actionsBox.innerHTML = health.actions.length
+    ? `<ul>${health.actions.map(a => `<li>${a}</li>`).join("")}</ul>`
+    : "<p>Keep wallet hygiene strong.</p>";
+}
+
+/* -------------------------------------------------------
+   HELPERS
+------------------------------------------------------- */
+function setText(id, value) {
+  const el = document.getElementById(id);
+  if (el) el.innerText = value;
+}
+
+function showResult() {
+  const box = document.getElementById("result");
+  if (box) box.classList.remove("hidden");
+}
+
+function hideResult() {
+  const box = document.getElementById("result");
+  if (box) box.classList.add("hidden");
 }
