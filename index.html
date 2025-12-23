@@ -1,133 +1,72 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<title>WalletHealth</title>
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-
-<style>
-body {
-  margin: 0;
-  font-family: system-ui, sans-serif;
-  background: radial-gradient(circle at top, #0f172a, #020617);
-  color: #fff;
-}
-.container {
-  max-width: 420px;
-  margin: auto;
-  padding: 30px 16px 60px;
-}
-h1 {
-  text-align: center;
-  margin-bottom: 4px;
-}
-.subtitle {
-  text-align: center;
-  opacity: 0.7;
-  margin-bottom: 24px;
-}
-input {
-  width: 100%;
-  padding: 14px;
-  border-radius: 12px;
-  border: none;
-  outline: none;
-  font-size: 14px;
-}
-button {
-  width: 100%;
-  margin-top: 14px;
-  padding: 14px;
-  border-radius: 14px;
-  border: none;
-  font-size: 16px;
-  background: linear-gradient(90deg, #22d3ee, #3b82f6);
-  color: #000;
-  font-weight: bold;
-}
-.card {
-  margin-top: 24px;
-  background: rgba(255,255,255,0.05);
-  border-radius: 20px;
-  padding: 20px;
-}
-.score {
-  font-size: 56px;
-  text-align: center;
-}
-.label {
-  text-align: center;
-  font-size: 20px;
-  margin-bottom: 10px;
-}
-.explain {
-  font-size: 13px;
-  opacity: 0.85;
-  line-height: 1.6;
-}
-.footer {
-  text-align: center;
-  opacity: 0.4;
-  margin-top: 30px;
-  font-size: 12px;
-}
-</style>
+  <meta charset="UTF-8" />
+  <title>WalletHealth – Keep Your Crypto Healthy</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="styles.css" />
 </head>
-
 <body>
+
 <div class="container">
-  <h1>WalletHealth</h1>
-  <div class="subtitle">Crypto Wallet Health Dashboard</div>
 
-  <input id="addr" placeholder="Paste ETH or BTC address" />
-  <button onclick="check()">Check Wallet Health</button>
+  <!-- HEADER -->
+  <header>
+    <h1>WalletHealth</h1>
+    <p class="tagline">Keep your crypto healthy</p>
+  </header>
 
-  <div id="result"></div>
+  <!-- INPUT -->
+  <section class="input-section">
+    <input id="addressInput" placeholder="Paste wallet address (ETH / BTC)" />
+    <button onclick="checkWallet()">Check Wallet Health</button>
+    <p class="trust-note">
+      🔒 Read-only · No wallet connect · No private keys
+    </p>
+  </section>
 
-  <div class="footer">
-    🔒 Read-only · No wallet connect · No private keys<br />
-    © 2025 WalletHealth · Not financial advice
-  </div>
+  <!-- RESULT -->
+  <section id="result" class="hidden">
+
+    <!-- SUMMARY -->
+    <div class="card summary">
+      <div class="score-circle" id="scoreCircle">–</div>
+      <div class="summary-info">
+        <p><b>Network:</b> <span id="network"></span></p>
+        <p><b>Wallet Type:</b> <span id="walletType"></span></p>
+        <p><b>Balance:</b> <span id="balance"></span></p>
+        <p class="status" id="statusLabel"></p>
+      </div>
+    </div>
+
+    <!-- WHY SCORE -->
+    <div class="card">
+      <h3>Why this score?</h3>
+      <ul id="reasons"></ul>
+    </div>
+
+    <!-- APPROVALS -->
+    <div class="card" id="approvalsCard">
+      <h3>Risky Approvals</h3>
+      <div id="approvalsList"></div>
+    </div>
+
+    <!-- ACTIONS -->
+    <div class="card">
+      <h3>What you can do</h3>
+      <ul id="actions"></ul>
+    </div>
+
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <p>Public blockchain data · Not financial advice</p>
+    <p>© 2025 WalletHealth</p>
+  </footer>
+
 </div>
 
-<script>
-const API = "https://wallethealth-api.singh-wsg.workers.dev";
-
-async function check() {
-  const addr = document.getElementById("addr").value.trim();
-  if (!addr) return;
-
-  document.getElementById("result").innerHTML = "Loading…";
-
-  try {
-    const res = await fetch(`${API}/?address=${addr}`);
-    const d = await res.json();
-
-    if (d.error) {
-      document.getElementById("result").innerHTML = d.error;
-      return;
-    }
-
-    document.getElementById("result").innerHTML = `
-      <div class="card">
-        <div class="score">${d.score}</div>
-        <div class="label">${d.label}</div>
-
-        <div class="explain">
-          🌐 Network: <b>${d.network}</b><br />
-          💰 Balance: <b>${d.balance} ${d.unit}</b><br /><br />
-
-          🧠 <b>Why this score?</b><br />
-          • ${d.explanation.balance}<br />
-          • ${d.explanation.walletType ?? d.explanation.activity}<br />
-          • ${d.explanation.note}
-        </div>
-      </div>
-    `;
-  } catch (e) {
-    document.getElementById("result").innerHTML = "Failed to fetch data";
-  }
-}
-</script>
+<script src="app.js"></script>
 </body>
 </html>
