@@ -6,7 +6,7 @@
  * - Cloudflare Workers backend
  *********************************************************/
 
-const API_URL = "https://wallethealth-api.singh-wsg.workers.dev";
+const API_URL = "https://ngh-wsg.workers.dev";
 
 /* ---------------- INIT ---------------- */
 
