@@ -1,26 +1,28 @@
-  const API_URL = "https://wallethealth-api.singh-wsg.workers.dev";
+/*********************************************************
+ * WalletHealth – FINAL STABLE FRONTEND SCRIPT
+ * Compatible with:
+ * - GitHub Pages
+ * - Mobile browsers
+ * - Cloudflare Workers backend
+ *********************************************************/
+
+const API_URL = "https://wallethealth-api.singh-wsg.workers.dev";
 
 /* ---------------- INIT ---------------- */
+
 document.addEventListener("DOMContentLoaded", () => {
   const btn = document.getElementById("checkBtn");
-  if (!btn) {
-    console.error("Button not found");
-    return;
-  }
   btn.addEventListener("click", checkWallet);
 });
 
 /* ---------------- MAIN ---------------- */
+
 async function checkWallet() {
   const input = document.getElementById("walletInput");
-  if (!input) {
-    alert("Wallet input not found");
-    return;
-  }
-
   const address = input.value.trim();
+
   if (!address) {
-    alert("Please enter wallet address");
+    alert("Please enter a wallet address");
     return;
   }
 
@@ -38,15 +40,16 @@ async function checkWallet() {
     const health = calculateWalletHealth(data);
     renderResult(data, health);
 
-  } catch (e) {
-    console.error(e);
-    alert("Failed to fetch data");
+  } catch (err) {
+    console.error(err);
+    alert("Failed to fetch wallet data");
   }
 }
 
-/* ---------------- HEALTH ENGINE ---------------- */
+/* ---------------- SCORING ENGINE ---------------- */
+
 function calculateWalletHealth(api) {
-  let score = 50; // neutral base
+  let score = 50;
   const reasons = [];
   const actions = [];
 
@@ -56,7 +59,6 @@ function calculateWalletHealth(api) {
   const network = api.meta?.network;
 
   if (network === "Bitcoin") {
-    // BTC logic
     if (balance > 0) score += 30;
     else {
       score -= 15;
@@ -70,11 +72,11 @@ function calculateWalletHealth(api) {
     else {
       score -= 20;
       reasons.push("Bitcoin wallet appears dormant");
-      actions.push("Consider reviewing long-term BTC storage");
+      actions.push("Review long-term BTC storage");
     }
 
   } else {
-    // ETH logic
+    // Ethereum logic
     if (txCount > 0) score += 30;
     else reasons.push("No recent Ethereum transactions");
 
@@ -82,7 +84,7 @@ function calculateWalletHealth(api) {
     else {
       score -= 30;
       reasons.push("Ethereum wallet is dormant");
-      actions.push("Check token approvals and activity");
+      actions.push("Check wallet activity and approvals");
     }
 
     if (balance > 0) score += 10;
@@ -98,15 +100,23 @@ function calculateWalletHealth(api) {
   };
 }
 
+function getScoreLabel(score) {
+  if (score >= 90) return "Very Healthy";
+  if (score >= 70) return "Healthy";
+  if (score >= 50) return "Needs Attention";
+  return "Risky";
+}
+
 /* ---------------- RENDER ---------------- */
+
 function renderResult(api, health) {
   showResult();
 
-  document.getElementById("score").innerText = health.score;
-  document.getElementById("network").innerText = api.meta.network;
-  document.getElementById("balance").innerText =
-    `${api.balance.value} ${api.balance.unit}`;
-  document.getElementById("status").innerText = health.label;
+  animateScore(health.score);
+
+  setText("network", api.meta.network);
+  setText("balance", `${api.balance.value} ${api.balance.unit}`);
+  setText("status", health.label);
 
   document.getElementById("reasons").innerHTML =
     health.reasons.length
@@ -119,11 +129,32 @@ function renderResult(api, health) {
       : "<p>Keep wallet hygiene strong.</p>";
 }
 
-/* ---------------- VISIBILITY ---------------- */
+/* ---------------- SCORE ANIMATION ---------------- */
+
+function animateScore(target) {
+  const el = document.getElementById("score");
+  let current = 0;
+
+  const timer = setInterval(() => {
+    current++;
+    el.innerText = current;
+    if (current >= target) {
+      clearInterval(timer);
+      el.innerText = target;
+    }
+  }, 15);
+}
+
+/* ---------------- HELPERS ---------------- */
+
+function setText(id, value) {
+  document.getElementById(id).innerText = value;
+}
+
 function showResult() {
   document.getElementById("result").classList.remove("hidden");
 }
 
 function hideResult() {
   document.getElementById("result").classList.add("hidden");
-}  
+}
