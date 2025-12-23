@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>WalletHealth – Keep Your Crypto Healthy</title>
+  <title>WalletHealth</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <link rel="stylesheet" href="styles.css" />
 </head>
@@ -18,8 +18,11 @@
 
   <!-- INPUT -->
   <section class="input-section">
-    <input id="addressInput" placeholder="Paste wallet address (ETH / BTC)" />
-    <button onclick="checkWallet()">Check Wallet Health</button>
+    <input
+      id="walletInput"
+      placeholder="Paste wallet address (ETH / BTC)"
+    />
+    <button id="checkBtn">Check Wallet Health</button>
     <p class="trust-note">
       🔒 Read-only · No wallet connect · No private keys
     </p>
@@ -30,31 +33,25 @@
 
     <!-- SUMMARY -->
     <div class="card summary">
-      <div class="score-circle" id="scoreCircle">–</div>
+      <div class="score-circle" id="score">--</div>
+
       <div class="summary-info">
-        <p><b>Network:</b> <span id="network"></span></p>
-        <p><b>Wallet Type:</b> <span id="walletType"></span></p>
-        <p><b>Balance:</b> <span id="balance"></span></p>
-        <p class="status" id="statusLabel"></p>
+        <p>Network: <span id="network">-</span></p>
+        <p>Balance: <span id="balance">-</span></p>
+        <p class="status" id="status">-</p>
       </div>
     </div>
 
-    <!-- WHY SCORE -->
+    <!-- WHY -->
     <div class="card">
       <h3>Why this score?</h3>
-      <ul id="reasons"></ul>
-    </div>
-
-    <!-- APPROVALS -->
-    <div class="card" id="approvalsCard">
-      <h3>Risky Approvals</h3>
-      <div id="approvalsList"></div>
+      <div id="reasons"></div>
     </div>
 
     <!-- ACTIONS -->
     <div class="card">
       <h3>What you can do</h3>
-      <ul id="actions"></ul>
+      <div id="actions"></div>
     </div>
 
   </section>
@@ -67,6 +64,7 @@
 
 </div>
 
+<!-- SCRIPT -->
 <script src="script.js"></script>
 </body>
 </html>
