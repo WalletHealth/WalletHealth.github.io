@@ -1,5 +1,15 @@
 const API_URL = "https://wallethealth-api.singh-wsg.workers.dev";
 
+document.addEventListener("DOMContentLoaded", () => {
+  const btn = document.querySelector("button");
+  btn.addEventListener("click", checkWallet);
+
+  // default score text
+  document.getElementById("scoreCircle").innerText = "0";
+});
+
+/* ---------------- MAIN ---------------- */
+
 async function checkWallet() {
   const input = document.getElementById("addressInput");
   const address = input.value.trim();
@@ -27,7 +37,7 @@ async function checkWallet() {
   }
 }
 
-/* ---------------- WALLET HEALTH ENGINE ---------------- */
+/* ---------------- HEALTH ENGINE ---------------- */
 
 function calculateWalletHealth(apiData) {
   let score = 0;
@@ -42,37 +52,33 @@ function calculateWalletHealth(apiData) {
   } else {
     score += 10;
     reasons.push("Wallet has zero balance.");
-    actions.push("Avoid leaving wallets empty for long periods.");
+    actions.push("Avoid leaving wallets unused.");
   }
 
-  // Activity
-  if (activity.txCount && activity.txCount > 0) {
+  // Activity (0 is valid)
+  if (activity.txCount !== null && activity.txCount > 0) {
     score += 25;
   } else {
     score += 10;
-    reasons.push("No recent on-chain activity.");
-    actions.push("Send a small self-transaction to keep wallet active.");
+    reasons.push("Low or no on-chain activity.");
+    actions.push("Review wallet usage periodically.");
   }
 
-  // Wallet type
+  // Network / wallet type
   if (meta.network === "Bitcoin") {
     score += 20;
   } else if (meta.addressType === "EOA") {
     score += 15;
   } else {
     score += 5;
-    reasons.push("Smart contract wallets need extra caution.");
+    reasons.push("Smart contract wallet detected.");
   }
 
-  // Approvals (ETH only)
-  if (approvals.supported) {
-    if (approvals.unlimitedCount > 0) {
-      score -= 15;
-      reasons.push("Unlimited token approvals detected.");
-      actions.push("Revoke risky approvals.");
-    } else {
-      score += 10;
-    }
+  // Approvals
+  if (approvals.supported && approvals.unlimitedCount > 0) {
+    score -= 15;
+    reasons.push("Unlimited token approvals found.");
+    actions.push("Revoke risky approvals.");
   }
 
   // Dormancy
@@ -81,7 +87,6 @@ function calculateWalletHealth(apiData) {
   } else {
     score -= 10;
     reasons.push("Wallet appears dormant.");
-    actions.push("Review wallet activity periodically.");
   }
 
   score = Math.max(0, Math.min(100, score));
@@ -95,7 +100,7 @@ function calculateWalletHealth(apiData) {
   };
 }
 
-/* ---------------- SCORE HELPERS ---------------- */
+/* ---------------- HELPERS ---------------- */
 
 function getScoreLabel(score) {
   if (score >= 90) return "Very Healthy";
@@ -105,10 +110,10 @@ function getScoreLabel(score) {
 }
 
 function getScoreColor(score) {
-  if (score >= 90) return "#22c55e";   // bright green
-  if (score >= 70) return "#10b981";   // green
-  if (score >= 50) return "#facc15";   // yellow
-  return "#ef4444";                    // red
+  if (score >= 90) return "#22c55e";
+  if (score >= 70) return "#10b981";
+  if (score >= 50) return "#facc15";
+  return "#ef4444";
 }
 
 /* ---------------- RENDER ---------------- */
@@ -124,15 +129,15 @@ function renderResult(api, health) {
 
   animateScore(health.score, health.color);
 
-  const reasonsBox = document.getElementById("reasons");
-  reasonsBox.innerHTML = health.reasons.length
-    ? health.reasons.map(r => `<li>${r}</li>`).join("")
-    : "<li>No major risk signals detected.</li>";
+  document.getElementById("reasons").innerHTML =
+    health.reasons.length
+      ? health.reasons.map(r => `<li>${r}</li>`).join("")
+      : "<li>No major risk signals detected.</li>";
 
-  const actionsBox = document.getElementById("actions");
-  actionsBox.innerHTML = health.actions.length
-    ? health.actions.map(a => `<li>${a}</li>`).join("")
-    : "<li>Keep wallet hygiene strong.</li>";
+  document.getElementById("actions").innerHTML =
+    health.actions.length
+      ? health.actions.map(a => `<li>${a}</li>`).join("")
+      : "<li>Keep wallet hygiene strong.</li>";
 }
 
 /* ---------------- SCORE ANIMATION ---------------- */
@@ -143,6 +148,7 @@ function animateScore(target, color) {
 
   el.style.color = color;
   el.style.borderColor = color;
+  el.innerText = "0";
 
   const interval = setInterval(() => {
     current++;
@@ -152,5 +158,5 @@ function animateScore(target, color) {
       clearInterval(interval);
       el.innerText = target;
     }
-  }, 15);
+  }, 20);
 }
