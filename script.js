@@ -1,27 +1,33 @@
 const API_URL = "https://wallethealth-api.singh-wsg.workers.dev";
 
-document.addEventListener("DOMContentLoaded", () => {
-  const btn = document.querySelector("button");
-  btn.addEventListener("click", checkWallet);
+/* ---------------- INIT ---------------- */
 
-  // default score text
-  document.getElementById("scoreCircle").innerText = "0";
+document.addEventListener("DOMContentLoaded", () => {
+  console.log("✅ WalletHealth script loaded");
 });
 
 /* ---------------- MAIN ---------------- */
 
 async function checkWallet() {
   const input = document.getElementById("addressInput");
-  const address = input.value.trim();
+  if (!input) {
+    alert("Address input not found");
+    return;
+  }
 
+  const address = input.value.trim();
   if (!address) {
     alert("Please enter a wallet address");
     return;
   }
 
+  hideResult();
+
   try {
     const res = await fetch(`${API_URL}?address=${address}`);
     const data = await res.json();
+
+    console.log("API RESPONSE:", data);
 
     if (data.error) {
       alert(data.error);
@@ -32,61 +38,45 @@ async function checkWallet() {
     renderResult(data, health);
 
   } catch (err) {
-    alert("Failed to fetch wallet data");
     console.error(err);
+    alert("Failed to fetch wallet data");
   }
 }
 
 /* ---------------- HEALTH ENGINE ---------------- */
 
-function calculateWalletHealth(apiData) {
+function calculateWalletHealth(api) {
   let score = 0;
   const reasons = [];
   const actions = [];
 
-  const { balance, activity, approvals, flags, meta } = apiData;
+  const balance = api.balance?.value ?? 0;
+  const txCount = api.activity?.txCount ?? 0;
+  const dormant = api.flags?.isDormant ?? false;
+  const network = api.meta?.network;
+  const approvalsSupported = api.approvals?.supported ?? false;
 
-  // Balance
-  if (balance.value > 0) {
-    score += 30;
-  } else {
+  if (balance > 0) score += 30;
+  else {
     score += 10;
     reasons.push("Wallet has zero balance.");
-    actions.push("Avoid leaving wallets unused.");
   }
 
-  // Activity (0 is valid)
-  if (activity.txCount !== null && activity.txCount > 0) {
-    score += 25;
-  } else {
+  if (txCount > 0) score += 25;
+  else {
     score += 10;
     reasons.push("Low or no on-chain activity.");
-    actions.push("Review wallet usage periodically.");
   }
 
-  // Network / wallet type
-  if (meta.network === "Bitcoin") {
-    score += 20;
-  } else if (meta.addressType === "EOA") {
-    score += 15;
-  } else {
-    score += 5;
-    reasons.push("Smart contract wallet detected.");
-  }
+  if (network === "Bitcoin") score += 20;
+  else score += 15;
 
-  // Approvals
-  if (approvals.supported && approvals.unlimitedCount > 0) {
-    score -= 15;
-    reasons.push("Unlimited token approvals found.");
-    actions.push("Revoke risky approvals.");
-  }
+  if (approvalsSupported) score += 10;
 
-  // Dormancy
-  if (!flags.isDormant) {
-    score += 15;
-  } else {
+  if (dormant) {
     score -= 10;
     reasons.push("Wallet appears dormant.");
+    actions.push("Review wallet usage periodically.");
   }
 
   score = Math.max(0, Math.min(100, score));
@@ -94,13 +84,10 @@ function calculateWalletHealth(apiData) {
   return {
     score,
     label: getScoreLabel(score),
-    color: getScoreColor(score),
     reasons,
     actions
   };
 }
-
-/* ---------------- HELPERS ---------------- */
 
 function getScoreLabel(score) {
   if (score >= 90) return "Very Healthy";
@@ -109,25 +96,17 @@ function getScoreLabel(score) {
   return "Risky";
 }
 
-function getScoreColor(score) {
-  if (score >= 90) return "#22c55e";
-  if (score >= 70) return "#10b981";
-  if (score >= 50) return "#facc15";
-  return "#ef4444";
-}
-
 /* ---------------- RENDER ---------------- */
 
 function renderResult(api, health) {
-  document.getElementById("result").classList.remove("hidden");
+  showResult();
 
+  document.getElementById("scoreCircle").innerText = health.score;
   document.getElementById("network").innerText = api.meta.network;
   document.getElementById("walletType").innerText = api.meta.addressType;
   document.getElementById("balance").innerText =
     `${api.balance.value} ${api.balance.unit}`;
   document.getElementById("statusLabel").innerText = health.label;
-
-  animateScore(health.score, health.color);
 
   document.getElementById("reasons").innerHTML =
     health.reasons.length
@@ -140,23 +119,12 @@ function renderResult(api, health) {
       : "<li>Keep wallet hygiene strong.</li>";
 }
 
-/* ---------------- SCORE ANIMATION ---------------- */
+/* ---------------- VISIBILITY ---------------- */
 
-function animateScore(target, color) {
-  const el = document.getElementById("scoreCircle");
-  let current = 0;
+function showResult() {
+  document.getElementById("result").classList.remove("hidden");
+}
 
-  el.style.color = color;
-  el.style.borderColor = color;
-  el.innerText = "0";
-
-  const interval = setInterval(() => {
-    current++;
-    el.innerText = current;
-
-    if (current >= target) {
-      clearInterval(interval);
-      el.innerText = target;
-    }
-  }, 20);
+function hideResult() {
+  document.getElementById("result").classList.add("hidden");
 }
